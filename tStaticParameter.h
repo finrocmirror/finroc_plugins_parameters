@@ -79,6 +79,8 @@ class tStaticParameter
 {
   static_assert(rrlib::serialization::tIsXMLSerializable<T>::value, "T has to be serializable to XML.");
 
+protected:
+
   /*! Class that contains actual implementation of most functionality */
   typedef internal::tStaticParameterImplementation<T, data_ports::tIsNumeric<T>::value> tImplementation;
 
@@ -108,9 +110,9 @@ public:
     implementation(NULL)
   {
     data_ports::tPortCreationInfo<T> creation_info(args...);
-    implementation = new tImplementation(creation_info);
+    implementation = new tImplementation(creation_info, false);
     assert(creation_info.parent != NULL);
-    internal::tStaticParameterList::GetOrCreate(*creation_info.parent).Add(implementation);
+    internal::tStaticParameterList::GetOrCreate(*creation_info.parent).Add(*implementation);
   }
 
   /*!
@@ -179,6 +181,21 @@ public:
   void SetConfigEntry(const std::string& config_entry)
   {
     implementation->SetConfigEntry(config_entry);
+  }
+
+//----------------------------------------------------------------------
+// Protected functions
+//----------------------------------------------------------------------
+protected:
+
+  tStaticParameter() : implementation(NULL) {}
+
+  /*!
+   * \param Implementation to use (for any subclasses)
+   */
+  void SetImplementation(tImplementation* implementation)
+  {
+    this->implementation = implementation;
   }
 
 //----------------------------------------------------------------------

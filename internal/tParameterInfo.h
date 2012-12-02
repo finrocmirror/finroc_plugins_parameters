@@ -79,6 +79,8 @@ public:
 
   tParameterInfo();
 
+  void Deserialize(const rrlib::xml::tNode& node, bool finstruct_context, bool include_commmand_line);
+
   /*!
    * \return Command line option to set this parameter
    * (set by outer-most finstructable group)
@@ -150,6 +152,8 @@ public:
    * (if value equals default value and entry does not exist, no entry is written to file)
    */
   void SaveValue();
+
+  void Serialize(rrlib::xml::tNode& node, bool finstruct_context, bool include_command_line) const;
 
   /*!
    * \param commandLineOption Command line option to set this parameter

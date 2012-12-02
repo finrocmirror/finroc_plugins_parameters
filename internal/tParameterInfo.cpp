@@ -96,6 +96,38 @@ void tParameterInfo::AnnotatedObjectInitialized()
   }
 }
 
+void tParameterInfo::Deserialize(const rrlib::xml::tNode& node, bool finstruct_context, bool include_commmand_line)
+{
+  if (node.HasAttribute("config"))
+  {
+    config_entry = node.GetStringAttribute("config");
+    entry_set_from_finstruct = finstruct_context;
+  }
+  else
+  {
+    config_entry = "";
+  }
+  if (include_commmand_line)
+  {
+    if (node.HasAttribute("cmdline"))
+    {
+      command_line_option = node.GetStringAttribute("cmdline");
+    }
+    else
+    {
+      command_line_option = "";
+    }
+  }
+  if (node.HasAttribute("default"))
+  {
+    finstruct_default = node.GetStringAttribute("default");
+  }
+  else
+  {
+    finstruct_default = "";
+  }
+}
+
 bool tParameterInfo::IsFinstructableGroupResponsibleForConfigFileConnections(const core::tFrameworkElement& finstructable_group, const core::tFrameworkElement& ap)
 {
   tConfigFile* cf = tConfigFile::Find(ap);
@@ -266,6 +298,26 @@ void tParameterInfo::SaveValue()
   else
   {
     throw std::runtime_error("Port Type not supported as a parameter");
+  }
+}
+
+void tParameterInfo::Serialize(rrlib::xml::tNode& node, bool finstruct_context, bool include_command_line) const
+{
+  assert(!(node.HasAttribute("default") || node.HasAttribute("cmdline") || node.HasAttribute("config")));
+  if (config_entry.length() > 0 && (entry_set_from_finstruct || (!finstruct_context)))
+  {
+    node.SetAttribute("config", config_entry);
+  }
+  if (include_command_line)
+  {
+    if (command_line_option.length() > 0)
+    {
+      node.SetAttribute("cmdline", command_line_option);
+    }
+  }
+  if (finstruct_default.length() > 0)
+  {
+    node.SetAttribute("default", finstruct_default);
   }
 }
 

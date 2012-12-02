@@ -39,6 +39,7 @@
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
+#include "plugins/data_ports/tPort.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -75,8 +76,8 @@ class tStaticParameterImplementation : public tStaticParameterImplementationBase
 //----------------------------------------------------------------------
 public:
 
-  tStaticParameterImplementation(const data_ports::tPortCreationInfo<T>& creation_info) :
-    tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<T>(), false, false, creation_info.config_entry)
+  tStaticParameterImplementation(const data_ports::tPortCreationInfo<T>& creation_info, bool constructor_prototype) :
+    tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<T>(), constructor_prototype, false, creation_info.config_entry)
   {
     if (creation_info.DefaultValueSet())
     {
@@ -102,7 +103,7 @@ private:
 
   virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
   {
-    return new tStaticParameterImplementation(data_ports::tPortCreationInfo<T>(GetName()));
+    return new tStaticParameterImplementation(data_ports::tPortCreationInfo<T>(GetName()), false);
   }
 };
 
@@ -119,8 +120,8 @@ class tStaticParameterImplementation<T, true> : public tStaticParameterImplement
 //----------------------------------------------------------------------
 public:
 
-  tStaticParameterImplementation(const data_ports::tPortCreationInfo<T>& creation_info) :
-    tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<data_ports::numeric::tNumber>(), false, false, creation_info.config_entry),
+  tStaticParameterImplementation(const data_ports::tPortCreationInfo<T>& creation_info, bool constructor_prototype) :
+    tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<data_ports::numeric::tNumber>(), constructor_prototype, false, creation_info.config_entry),
     unit(creation_info.unit),
     bounds(creation_info.BoundsSet() ? creation_info.GetBounds() : data_ports::tBounds<T>())
   {
@@ -173,7 +174,7 @@ private:
 
   virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
   {
-    return new tStaticParameterImplementation(data_ports::tPortCreationInfo<T>(GetName(), unit, bounds));
+    return new tStaticParameterImplementation(data_ports::tPortCreationInfo<T>(GetName(), unit, bounds), false);
   }
 };
 

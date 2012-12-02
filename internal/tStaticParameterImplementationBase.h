@@ -80,7 +80,7 @@ public:
    * \param type DataType of parameter
    * \param constructor_prototype Is this a CreteModuleActionPrototype (no buffer will be allocated)
    */
-  tStaticParameterImplementationBase(const std::string& name, rrlib::rtti::tType type, bool constructor_prototype, bool structure_parameter_proxy = false, const std::string& config_entry = "");
+  tStaticParameterImplementationBase(const std::string& name, rrlib::rtti::tType type, bool constructor_prototype, bool static_parameter_proxy = false, const std::string& config_entry = "");
 
   virtual ~tStaticParameterImplementationBase();
 

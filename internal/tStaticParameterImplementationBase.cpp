@@ -73,7 +73,7 @@ namespace internal
 // Implementation
 //----------------------------------------------------------------------
 
-tStaticParameterImplementationBase::tStaticParameterImplementationBase(const std::string& name, rrlib::rtti::tType type, bool constructor_prototype, bool structure_parameter_proxy, const std::string& config_entry) :
+tStaticParameterImplementationBase::tStaticParameterImplementationBase(const std::string& name, rrlib::rtti::tType type, bool constructor_prototype, bool static_parameter_proxy, const std::string& config_entry) :
   name(name),
   type(type),
   value(),
@@ -87,7 +87,7 @@ tStaticParameterImplementationBase::tStaticParameterImplementationBase(const std
   create_outer_parameter(false),
   config_entry(config_entry),
   config_entry_set_by_finstruct(false),
-  static_parameter_proxy(structure_parameter_proxy),
+  static_parameter_proxy(static_parameter_proxy),
   attached_parameters()
 {
   if (!constructor_prototype)
