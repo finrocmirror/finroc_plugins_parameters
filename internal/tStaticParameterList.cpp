@@ -100,7 +100,7 @@ void tStaticParameterList::Clear()
 {
   for (int i = parameters.size() - 1; i >= 0; i--)
   {
-    delete &parameters[i];
+    delete parameters[i];
   }
   parameters.clear();
 }
