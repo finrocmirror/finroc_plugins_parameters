@@ -109,7 +109,7 @@ public:
   tParameter(const ARGS&... args) : implementation(data_ports::tPortCreationInfo<T>(args...))
   {
     data_ports::tPortCreationInfo<T> creation_info(args...);
-    this->wrapped->AddAnnotation(*(new internal::tParameterInfo()));
+    implementation.GetWrapped()->AddAnnotation(*(new internal::tParameterInfo()));
     SetConfigEntry(creation_info.config_entry);
   }
 

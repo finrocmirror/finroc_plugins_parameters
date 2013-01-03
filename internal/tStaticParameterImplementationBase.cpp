@@ -156,18 +156,7 @@ void tStaticParameterImplementationBase::Deserialize(rrlib::serialization::tInpu
 
   try
   {
-    if (is.ReadBoolean())
-    {
-      rrlib::rtti::tType dt;
-      is >> dt;
-      rrlib::rtti::tGenericObject* val = ValuePointer();
-      if (val->GetType() != dt)
-      {
-        CreateBuffer(dt);
-        val = ValuePointer();
-      }
-      rrlib::serialization::Deserialize(is, *val, rrlib::serialization::tDataEncoding::XML);
-    }
+    DeserializeValue(is);
   }
   catch (const std::exception& e)
   {
@@ -222,6 +211,22 @@ void tStaticParameterImplementationBase::Deserialize(const rrlib::xml::tNode& no
   }
 
   UpdateAndPossiblyLoad(command_line_option_tmp, config_entry_tmp);
+}
+
+void tStaticParameterImplementationBase::DeserializeValue(rrlib::serialization::tInputStream& is)
+{
+  if (is.ReadBoolean())
+  {
+    rrlib::rtti::tType dt;
+    is >> dt;
+    rrlib::rtti::tGenericObject* val = ValuePointer();
+    if (val->GetType() != dt)
+    {
+      CreateBuffer(dt);
+      val = ValuePointer();
+    }
+    rrlib::serialization::Deserialize(is, *val, rrlib::serialization::tDataEncoding::XML);
+  }
 }
 
 void tStaticParameterImplementationBase::GetAllAttachedParameters(std::vector<tStaticParameterImplementationBase*>& result)

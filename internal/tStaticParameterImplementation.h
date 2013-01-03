@@ -81,7 +81,7 @@ public:
   {
     if (creation_info.DefaultValueSet())
     {
-      rrlib::serialization::tInputStream is(&creation_info.GetDefaultGeneric());
+      rrlib::serialization::tInputStream is(creation_info.GetDefaultGeneric());
       is >> *(ValuePointer());
     }
   }

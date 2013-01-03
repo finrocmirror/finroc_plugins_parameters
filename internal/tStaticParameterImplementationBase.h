@@ -106,6 +106,13 @@ public:
   void Deserialize(const rrlib::xml::tNode& node, bool finstruct_context);
 
   /*!
+   * Deserializes value from stream
+   *
+   * \param is Input stream
+   */
+  void DeserializeValue(rrlib::serialization::tInputStream& is);
+
+  /*!
    * \param result Result buffer for all attached parameters (including those from parameters this parameter is possibly (indirectly) attached to)
    */
   void GetAllAttachedParameters(std::vector<tStaticParameterImplementationBase*>& result);
