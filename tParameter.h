@@ -86,6 +86,10 @@ public:
   /*! Should methods passing buffers by-value be available? */
   enum { cPASS_BY_VALUE = data_ports::tIsCheaplyCopiedType<T>::value };
 
+  /*! Creates no wrapped parameter */
+  tParameter() : implementation()
+  {}
+
   /*!
    * Constructor takes variadic argument list... just any properties you want to assign to parameter.
    *
@@ -111,6 +115,15 @@ public:
     data_ports::tPortCreationInfo<T> creation_info(args...);
     implementation.GetWrapped()->AddAnnotation(*(new internal::tParameterInfo()));
     SetConfigEntry(creation_info.config_entry);
+  }
+
+  /*!
+   * \param listener Listener to add (see tInputPort.h)
+   */
+  template <typename TListener>
+  void AddListener(TListener& listener)
+  {
+    implementation.AddPortListener(listener);
   }
 
   /*!
@@ -143,6 +156,14 @@ public:
   inline data_ports::tPortDataPointer<const T> GetPointer() const
   {
     return implementation.GetPointer();
+  }
+
+  /*!
+   * \return Wrapped port. For rare case that someone really needs to access ports.
+   */
+  inline typename tImplementation::tPortBackend* GetWrapped() const
+  {
+    return implementation.GetWrapped();
   }
 
   /*!

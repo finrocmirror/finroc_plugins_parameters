@@ -75,6 +75,8 @@ class tParameterImplementation : public data_ports::tInputPort<T>
 //----------------------------------------------------------------------
 public:
 
+  tParameterImplementation() {}
+
   tParameterImplementation(data_ports::tPortCreationInfo<T> creation_info) :
     data_ports::tInputPort<T>(creation_info)
   {}
@@ -90,7 +92,7 @@ private:
  * Caches numeric value of parameter port (optimization, since values hardly ever change)
  */
 template <typename T, bool FLOATING_POINT>
-class tValueCache : public data_ports::tPortListener<T>
+class tValueCache
 {
 public:
 
@@ -111,7 +113,7 @@ private:
   /*! Cached current value (we will much more often read than it will be changed) */
   std::atomic<T> current_value;
 
-  virtual void PortChanged(data_ports::common::tAbstractDataPort& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
+  virtual void PortChanged(data_ports::tInputPort<T>& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
   {
     Set(value);
   }
@@ -119,7 +121,7 @@ private:
 
 // float implementation (there's no std::atomic<float> in gcc 4.6)
 template <typename T>
-struct tValueCache<T, true> : public data_ports::tPortListener<T>
+struct tValueCache<T, true>
 {
   typedef typename std::conditional<std::is_same<T, double>::value, uint64_t, uint32_t>::type tStorage;
   static_assert(sizeof(T) == sizeof(tStorage), "Storage size should be identical");
@@ -155,7 +157,7 @@ private:
   /*! Cached current value (we will much more often read than it will be changed) */
   std::atomic<tStorage> current_value;
 
-  virtual void PortChanged(data_ports::common::tAbstractDataPort& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
+  virtual void PortChanged(data_ports::tInputPort<T>& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
   {
     Set(value);
   }
@@ -170,6 +172,8 @@ class tParameterImplementation<T, true> : public data_ports::tInputPort<T>
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
+
+  tParameterImplementation() {}
 
   tParameterImplementation(data_ports::tPortCreationInfo<T> creation_info) :
     data_ports::tInputPort<T>(creation_info),
