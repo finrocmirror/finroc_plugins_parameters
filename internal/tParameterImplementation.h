@@ -108,15 +108,15 @@ public:
     current_value = value;
   }
 
+  void PortChanged(data_ports::tInputPort<T>& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
+  {
+    Set(value);
+  }
+
 private:
 
   /*! Cached current value (we will much more often read than it will be changed) */
   std::atomic<T> current_value;
-
-  virtual void PortChanged(data_ports::tInputPort<T>& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
-  {
-    Set(value);
-  }
 };
 
 // float implementation (there's no std::atomic<float> in gcc 4.6)
@@ -152,15 +152,16 @@ public:
     current_value = stored_value;
   }
 
+  void PortChanged(data_ports::tInputPort<T>& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
+  {
+    Set(value);
+  }
+
 private:
 
   /*! Cached current value (we will much more often read than it will be changed) */
   std::atomic<tStorage> current_value;
 
-  virtual void PortChanged(data_ports::tInputPort<T>& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
-  {
-    Set(value);
-  }
 };
 
 template <typename T>
