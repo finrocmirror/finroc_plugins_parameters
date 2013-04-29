@@ -108,7 +108,7 @@ public:
     current_value = value;
   }
 
-  void PortChanged(data_ports::tInputPort<T>& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
+  void PortChanged(const T& value, data_ports::tChangeContext& change_context)
   {
     Set(value);
   }
@@ -152,7 +152,7 @@ public:
     current_value = stored_value;
   }
 
-  void PortChanged(data_ports::tInputPort<T>& origin, const T& value, const rrlib::time::tTimestamp& timestamp)
+  void PortChanged(const T& value, data_ports::tChangeContext& change_context)
   {
     Set(value);
   }
