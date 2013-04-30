@@ -168,6 +168,7 @@ template <typename T>
 class tParameterImplementation<T, true> : public data_ports::tInputPort<T>
 {
   typedef tValueCache<T, std::is_floating_point<T>::value> tCache;
+  typedef data_ports::tInputPort<T> tBase;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -181,7 +182,7 @@ public:
     cache(new tCache())
   {
     this->AddPortListener(*cache);
-    cache->Set(this->Get());
+    cache->Set(tBase::Get());
   }
 
   T Get() const
