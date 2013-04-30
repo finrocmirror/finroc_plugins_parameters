@@ -89,6 +89,9 @@ protected:
 //----------------------------------------------------------------------
 public:
 
+  /*! Type T */
+  typedef T tDataType;
+
   /*!
    * Constructor takes variadic argument list... just any properties you want to assign to parameter.
    *
@@ -110,7 +113,7 @@ public:
     implementation(NULL)
   {
     data_ports::tPortCreationInfo<T> creation_info(args...);
-    implementation = new tImplementation(creation_info, false);
+    implementation = tImplementation::CreateInstance(creation_info, false);
     assert(creation_info.parent != NULL);
     internal::tStaticParameterList::GetOrCreate(*creation_info.parent).Add(*implementation);
   }

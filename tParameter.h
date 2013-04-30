@@ -86,6 +86,9 @@ public:
   /*! Should methods passing buffers by-value be available? */
   enum { cPASS_BY_VALUE = data_ports::tIsCheaplyCopiedType<T>::value };
 
+  /*! Type T */
+  typedef T tDataType;
+
   /*! Creates no wrapped parameter */
   tParameter() : implementation()
   {}
@@ -124,6 +127,11 @@ public:
   void AddListener(TListener& listener)
   {
     implementation.AddPortListener(listener);
+  }
+  template <typename TListener>
+  void AddPortListenerSimple(TListener& listener)
+  {
+    implementation.AddPortListenerSimple(listener);
   }
 
   /*!
@@ -164,6 +172,22 @@ public:
   inline typename tImplementation::tPortBackend* GetWrapped() const
   {
     return implementation.GetWrapped();
+  }
+
+  /*!
+   * \return Has parameter changed since last changed-flag-reset?
+   */
+  inline bool HasChanged() const
+  {
+    return implementation.HasChanged();
+  }
+
+  /*!
+   * Reset changed flag.
+   */
+  inline void ResetChanged()
+  {
+    implementation.ResetChanged();
   }
 
   /*!
