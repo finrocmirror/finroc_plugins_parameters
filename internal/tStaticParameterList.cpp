@@ -146,7 +146,7 @@ void tStaticParameterList::DoStaticParameterEvaluation(core::tFrameworkElement& 
 
     if (changed)
     {
-      fe.EvaluateStaticParameters();
+      fe.OnStaticParameterChange();
 
       // Reset change flags for all parameters
       for (size_t i = 0; i < spl->Size(); i++)
