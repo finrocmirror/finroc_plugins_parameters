@@ -190,6 +190,11 @@ public:
     return cache->Get();
   }
 
+  void Get(T& result) const
+  {
+    result = cache->Get();
+  }
+
   inline data_ports::tPortDataPointer<const T> GetPointer() const
   {
     return data_ports::tPortDataPointer<const T>(data_ports::api::tPortDataPointerImplementation<T, true>(Get(), rrlib::time::cNO_TIME));

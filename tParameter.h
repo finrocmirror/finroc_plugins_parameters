@@ -135,7 +135,7 @@ public:
   }
 
   /*!
-   * Gets Port's current value.
+   * Gets parameter's current value.
    * (only available for 'cheaply copied' types)
    *
    * \param v unused dummy parameter for std::enable_if technique
@@ -145,6 +145,19 @@ public:
   inline T Get(typename std::enable_if<AVAILABLE, void>::type* v = NULL) const
   {
     return implementation.Get();
+  }
+
+  /*!
+   * Gets parameter's current value
+   *
+   * (Using this Get()-variant is efficient when using 'cheaply copied' types,
+   * but can be extremely costly with large data types)
+   *
+   * \param result Buffer to (deep) copy parameter's current value to
+   */
+  inline void Get(T& result) const
+  {
+    return implementation.Get(result);
   }
 
   /*!
