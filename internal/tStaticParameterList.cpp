@@ -33,7 +33,6 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "rrlib/rtti/rtti.h"
-#include "rrlib/finroc_core_utils/tException.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -226,7 +225,7 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
     int read_action = stream.ReadInt();
     if (list.GetCreateAction() != read_action || list.Size() != static_cast<size_t>(stream.ReadInt()))
     {
-      throw util::tRuntimeException("Invalid action id or parameter number", CODE_LOCATION_MACRO);
+      throw std::runtime_error("Invalid action id or parameter number");
     }
     core::tFrameworkElement* ann = list.GetAnnotated();
     for (size_t i = 0; i < list.Size(); i++)

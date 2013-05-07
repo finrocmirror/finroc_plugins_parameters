@@ -33,7 +33,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "rrlib/rtti/rtti.h"
-#include "rrlib/finroc_core_utils/sFiles.h"
+#include "core/file_lookup.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -93,11 +93,11 @@ tConfigFile::tConfigFile(const std::string& filename) :
   filename(filename),
   active(true)
 {
-  if (util::sFiles::FinrocFileExists(filename))
+  if (core::FinrocFileExists(filename))
   {
     try
     {
-      wrapped = util::sFiles::GetFinrocXMLDocument(filename, false); // false = do not validate with dtd
+      wrapped = core::GetFinrocXMLDocument(filename, false); // false = do not validate with dtd
       return;
     }
     catch (const std::exception& e)
@@ -174,13 +174,13 @@ rrlib::xml::tNode& tConfigFile::GetEntry(const std::string& entry, bool create)
       }
       else
       {
-        throw util::tRuntimeException(std::string("Node not found: ") + entry, CODE_LOCATION_MACRO);
+        throw std::runtime_error(std::string("Config node not found: ") + entry);
       }
     }
   }
   if (!boost::equals(cXML_LEAF_NAME, current->Name()))
   {
-    throw util::tRuntimeException("Node no leaf", CODE_LOCATION_MACRO);
+    throw std::runtime_error("Config node no leaf");
   }
 
   // Recreate node?
@@ -283,10 +283,10 @@ void tConfigFile::SaveFile()
 
   try
   {
-    std::string save_to = util::sFiles::GetFinrocFileToSaveTo(filename);
+    std::string save_to = core::GetFinrocFileToSaveTo(filename);
     if (save_to.length() == 0)
     {
-      std::string save_to_alt = util::sFiles::GetFinrocFileToSaveTo(boost::replace_all_copy(filename, "/", "_"));
+      std::string save_to_alt = core::GetFinrocFileToSaveTo(boost::replace_all_copy(filename, "/", "_"));
       FINROC_LOG_PRINT(ERROR, "There does not seem to be any suitable location for: '", filename, "' . For now, using '", save_to_alt, "'.");
       save_to = save_to_alt;
     }
@@ -325,11 +325,11 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
   if (config_file.active && file.length() > 0 && content.length() == 0 && (!boost::equals(file, config_file.filename)))
   {
     // load file
-    if (util::sFiles::FinrocFileExists(file))
+    if (core::FinrocFileExists(file))
     {
       try
       {
-        config_file.wrapped = util::sFiles::GetFinrocXMLDocument(file, false);
+        config_file.wrapped = core::GetFinrocXMLDocument(file, false);
       }
       catch (const std::exception& e)
       {
