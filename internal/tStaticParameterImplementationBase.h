@@ -67,7 +67,7 @@ class tStaticParameterList;
 /*!
  * Base class (without template parameter) for all static parameters.
  */
-class tStaticParameterImplementationBase : public boost::noncopyable
+class tStaticParameterImplementationBase : private rrlib::util::tNoncopyable
 {
 
 //----------------------------------------------------------------------

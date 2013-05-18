@@ -323,7 +323,7 @@ void tParameterInfo::Serialize(rrlib::xml::tNode& node, bool finstruct_context, 
 
 void tParameterInfo::SetConfigEntry(const std::string& config_entry_, bool finstruct_set)
 {
-  if (!boost::equals(this->config_entry, config_entry_))
+  if (this->config_entry.compare(config_entry) != 0)
   {
     this->config_entry = config_entry_;
     this->entry_set_from_finstruct = finstruct_set;
@@ -354,8 +354,9 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
   std::string config_entry_tmp = stream.ReadString();
   std::string command_line_option_tmp = stream.ReadString();
   std::string finstruct_default_tmp = stream.ReadString();
-  bool same = boost::equals(config_entry_tmp, parameter_info.GetConfigEntry()) &&
-              boost::equals(command_line_option_tmp, parameter_info.GetCommandLineOption()) && boost::equals(finstruct_default_tmp, parameter_info.GetFinstructDefault());
+  bool same = config_entry_tmp.compare(parameter_info.GetConfigEntry()) == 0 &&
+              command_line_option_tmp.compare(parameter_info.GetCommandLineOption()) == 0 &&
+              finstruct_default_tmp.compare(parameter_info.GetFinstructDefault()) == 0;
   parameter_info.config_entry = config_entry_tmp;
   parameter_info.command_line_option = command_line_option_tmp;
   parameter_info.finstruct_default = finstruct_default_tmp;

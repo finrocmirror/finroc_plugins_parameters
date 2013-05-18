@@ -34,6 +34,7 @@
 //----------------------------------------------------------------------
 #include "rrlib/rtti/rtti.h"
 #include "core/file_lookup.h"
+#include <boost/algorithm/string.hpp>
 
 //----------------------------------------------------------------------
 // Internal includes with ""

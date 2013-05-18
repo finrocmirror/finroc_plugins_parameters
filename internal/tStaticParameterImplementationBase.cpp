@@ -363,7 +363,7 @@ void tStaticParameterImplementationBase::Serialize(rrlib::serialization::tOutput
 void tStaticParameterImplementationBase::Serialize(rrlib::xml::tNode& node, bool finstruct_context) const
 {
   assert(!(node.HasAttribute("type") || node.HasAttribute("cmdline") || node.HasAttribute("config") || node.HasAttribute("attachouter")));
-  rrlib::rtti::tTypedObject* val = ValuePointer();
+  rrlib::rtti::tGenericObject* val = ValuePointer();
   if (val->GetType() != type || static_parameter_proxy)
   {
     node.SetAttribute("type", val->GetType().GetName());
@@ -406,7 +406,7 @@ void tStaticParameterImplementationBase::Set(const std::string& s)
 void tStaticParameterImplementationBase::SetConfigEntry(const std::string& config_entry)
 {
   config_entry_set_by_finstruct = false;
-  if (!boost::equals(config_entry, this->config_entry))
+  if (config_entry.compare(this->config_entry) != 0)
   {
     this->config_entry = config_entry;
     if (GetParentList() && GetParentList()->GetAnnotated() && GetParentList()->GetAnnotated()->IsReady())
@@ -426,8 +426,8 @@ void tStaticParameterImplementationBase::SetOuterParameterAttachment(const std::
 
 void tStaticParameterImplementationBase::UpdateAndPossiblyLoad(const std::string& command_line_option_tmp, const std::string& config_entry_tmp)
 {
-  bool cmdline_changed = !boost::equals(command_line_option, command_line_option_tmp);
-  bool config_entry_changed = !boost::equals(config_entry, config_entry_tmp);
+  bool cmdline_changed = command_line_option.compare(command_line_option_tmp) != 0;
+  bool config_entry_changed = config_entry.compare(config_entry_tmp) != 0;
   command_line_option = command_line_option_tmp;
   config_entry = config_entry_tmp;
 
@@ -453,7 +453,8 @@ void tStaticParameterImplementationBase::UpdateOuterParameterAttachment()
   else
   {
     tStaticParameterImplementationBase* sp = &GetParameterWithBuffer();
-    if ((!boost::equals(sp->GetName(), outer_parameter_attachment)) || (sp == this))
+    bool name_differs = sp->GetName().compare(outer_parameter_attachment) != 0;
+    if (name_differs || (sp == this))
     {
 
       // find parameter to attach to
@@ -468,7 +469,7 @@ void tStaticParameterImplementationBase::UpdateOuterParameterAttachment()
       for (size_t i = 0; i < spl.Size(); i++)
       {
         sp = &spl.Get(i);
-        if (boost::equals(sp->GetName(), outer_parameter_attachment))
+        if (sp->GetName().compare(outer_parameter_attachment) == 0) // equals?
         {
           AttachTo(sp);
           return;
