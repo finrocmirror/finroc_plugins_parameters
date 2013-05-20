@@ -225,7 +225,7 @@ void tStaticParameterImplementationBase::DeserializeValue(rrlib::serialization::
       CreateBuffer(dt);
       val = ValuePointer();
     }
-    rrlib::serialization::Deserialize(is, *val, rrlib::serialization::tDataEncoding::XML);
+    val->Deserialize(is, rrlib::serialization::tDataEncoding::XML);
   }
 }
 
@@ -356,7 +356,7 @@ void tStaticParameterImplementationBase::Serialize(rrlib::serialization::tOutput
   if (val != NULL)
   {
     os << val->GetType();
-    rrlib::serialization::Serialize(os, *val, rrlib::serialization::tDataEncoding::XML);
+    val->Serialize(os, rrlib::serialization::tDataEncoding::XML);
   }
 }
 
