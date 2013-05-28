@@ -321,11 +321,11 @@ void tParameterInfo::Serialize(rrlib::xml::tNode& node, bool finstruct_context, 
   }
 }
 
-void tParameterInfo::SetConfigEntry(const std::string& config_entry_, bool finstruct_set)
+void tParameterInfo::SetConfigEntry(const std::string& config_entry, bool finstruct_set)
 {
   if (this->config_entry.compare(config_entry) != 0)
   {
-    this->config_entry = config_entry_;
+    this->config_entry = config_entry;
     this->entry_set_from_finstruct = finstruct_set;
     try
     {
