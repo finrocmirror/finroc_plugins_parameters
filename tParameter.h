@@ -196,6 +196,18 @@ public:
   }
 
   /*!
+   * Initialize this parameter.
+   * This must be called prior to using parameter.
+   *
+   * For parameters created in e.g. component constructor, this is done automatically.
+   * For parameters created dynamically, this usually needs to be called.
+   */
+  inline void Init()
+  {
+    implementation.Init();
+  }
+
+  /*!
    * Reset changed flag.
    */
   inline void ResetChanged()
