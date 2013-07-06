@@ -186,7 +186,7 @@ public:
   /*!
    * \param s Serialized as string
    */
-  virtual void Set(const std::string& s);
+  void Set(const std::string& s);
 
   /*!
    * \param config_entry Place in Configuration tree, this parameter is configured from.
