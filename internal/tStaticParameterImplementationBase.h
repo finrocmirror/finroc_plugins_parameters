@@ -324,8 +324,10 @@ private:
   /*!
    * Check whether change to outerParameterAttachment occured and perform any
    * changes required.
+   *
+   * \param outer_attachement_string_changed Has outer_parameter_attachment string changed?
    */
-  void UpdateOuterParameterAttachment();
+  void UpdateOuterParameterAttachment(bool outer_attachement_string_changed);
 };
 
 //----------------------------------------------------------------------

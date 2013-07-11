@@ -146,12 +146,12 @@ void tStaticParameterImplementationBase::Deserialize(rrlib::serialization::tInpu
   is >> dt;
 
   std::string command_line_option_tmp = is.ReadString();
-  outer_parameter_attachment = is.ReadString();
+  std::string outer_parameter_attachment_temp = is.ReadString();
   create_outer_parameter = is.ReadBoolean();
   std::string config_entry_tmp = is.ReadString();
   config_entry_set_by_finstruct = is.ReadBoolean();
   enforce_current_value = is.ReadBoolean();
-  UpdateOuterParameterAttachment();
+  SetOuterParameterAttachment(outer_parameter_attachment_temp, create_outer_parameter);
   UpdateAndPossiblyLoad(command_line_option_tmp, config_entry_tmp);
 
   try
@@ -191,13 +191,11 @@ void tStaticParameterImplementationBase::Deserialize(const rrlib::xml::tNode& no
   }
   if (node.HasAttribute("attachouter"))
   {
-    outer_parameter_attachment = node.GetStringAttribute("attachouter");
-    UpdateOuterParameterAttachment();
+    SetOuterParameterAttachment(node.GetStringAttribute("attachouter"), true);
   }
   else
   {
-    outer_parameter_attachment = "";
-    UpdateOuterParameterAttachment();
+    SetOuterParameterAttachment("", false);
   }
   std::string config_entry_tmp;
   if (node.HasAttribute("config"))
@@ -237,7 +235,7 @@ void tStaticParameterImplementationBase::GetAllAttachedParameters(std::vector<tS
   for (size_t i = 0; i < result.size(); i++)
   {
     tStaticParameterImplementationBase* param = result[i];
-    if (param->use_value_of != NULL && param->use_value_of != this && (/* result does not contain param */std::find(result.begin(), result.end(), param) == result.end()))
+    if (param->use_value_of != NULL && param->use_value_of != this && (/* result does not contain param */std::find(result.begin(), result.end(), param->use_value_of) == result.end()))
     {
       result.push_back(param->use_value_of);
     }
@@ -418,10 +416,11 @@ void tStaticParameterImplementationBase::SetConfigEntry(const std::string& confi
 
 void tStaticParameterImplementationBase::SetOuterParameterAttachment(const std::string& outer_parameter_attachment, bool create_outer)
 {
+  bool string_changed = this->outer_parameter_attachment != outer_parameter_attachment;
   this->outer_parameter_attachment = outer_parameter_attachment;
   create_outer_parameter = create_outer;
 
-  UpdateOuterParameterAttachment();
+  UpdateOuterParameterAttachment(string_changed);
 }
 
 void tStaticParameterImplementationBase::UpdateAndPossiblyLoad(const std::string& command_line_option_tmp, const std::string& config_entry_tmp)
@@ -437,7 +436,7 @@ void tStaticParameterImplementationBase::UpdateAndPossiblyLoad(const std::string
   }
 }
 
-void tStaticParameterImplementationBase::UpdateOuterParameterAttachment()
+void tStaticParameterImplementationBase::UpdateOuterParameterAttachment(bool outer_attachement_string_changed)
 {
   if (parent_list == NULL)
   {
@@ -445,7 +444,7 @@ void tStaticParameterImplementationBase::UpdateOuterParameterAttachment()
   }
   if (outer_parameter_attachment.length() == 0)
   {
-    if (use_value_of != this)
+    if (outer_attachement_string_changed && use_value_of != this)
     {
       AttachTo(this);
     }
