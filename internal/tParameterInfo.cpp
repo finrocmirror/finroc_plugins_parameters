@@ -167,7 +167,7 @@ void tParameterInfo::LoadValue(bool ignore_ready)
           if (data_ports::IsDataFlowType(ann->GetDataType()))
           {
             rrlib::serialization::tStringInputStream sis(arg);
-            data_ports::tGenericPort port = data_ports::tGenericPort::Wrap(*ann);
+            data_ports::tGenericPort port = data_ports::tGenericPort::Wrap(*ann, true);
             data_ports::tPortDataPointer<rrlib::rtti::tGenericObject> buffer = port.GetUnusedBuffer();
             try
             {
@@ -201,7 +201,7 @@ void tParameterInfo::LoadValue(bool ignore_ready)
           rrlib::xml::tNode& node = cf->GetEntry(full_config_entry, false);
           if (data_ports::IsDataFlowType(ann->GetDataType()))
           {
-            data_ports::tGenericPort port = data_ports::tGenericPort::Wrap(*ann);
+            data_ports::tGenericPort port = data_ports::tGenericPort::Wrap(*ann, true);
             data_ports::tPortDataPointer<rrlib::rtti::tGenericObject> buffer = port.GetUnusedBuffer();
 
             try
@@ -232,7 +232,7 @@ void tParameterInfo::LoadValue(bool ignore_ready)
         if (data_ports::IsDataFlowType(ann->GetDataType()))
         {
           rrlib::serialization::tStringInputStream sis(finstruct_default);
-          data_ports::tGenericPort port = data_ports::tGenericPort::Wrap(*ann);
+          data_ports::tGenericPort port = data_ports::tGenericPort::Wrap(*ann, true);
           data_ports::tPortDataPointer<rrlib::rtti::tGenericObject> buffer = port.GetUnusedBuffer();
 
           try
@@ -270,7 +270,7 @@ void tParameterInfo::SaveValue()
   bool has_entry = cf->HasEntry(config_entry);
   if (data_ports::IsDataFlowType(ann->GetDataType()))
   {
-    data_ports::tGenericPort port = data_ports::tGenericPort::Wrap(*ann);
+    data_ports::tGenericPort port = data_ports::tGenericPort::Wrap(*ann, true);
     if (has_entry)
     {
       // Does port contain default value?
