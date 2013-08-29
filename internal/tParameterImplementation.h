@@ -92,7 +92,7 @@ private:
  * Caches numeric value of parameter port (optimization, since values hardly ever change)
  */
 template <typename T, bool FLOATING_POINT>
-class tValueCache
+class tValueCache : public core::tAnnotation
 {
 public:
 
@@ -121,7 +121,7 @@ private:
 
 // float implementation (there's no std::atomic<float> in gcc 4.6)
 template <typename T>
-struct tValueCache<T, true>
+struct tValueCache<T, true> : public core::tAnnotation
 {
   typedef typename std::conditional<std::is_same<T, double>::value, uint64_t, uint32_t>::type tStorage;
   static_assert(sizeof(T) == sizeof(tStorage), "Storage size should be identical");
@@ -181,6 +181,7 @@ public:
     data_ports::tInputPort<T>(creation_info),
     cache(new tCache())
   {
+    this->AddAnnotation(*cache);
     this->AddPortListener(*cache);
     cache->Set(tBase::Get());
   }
@@ -206,7 +207,7 @@ public:
 private:
 
   /*! cache instance used for this parameter */
-  std::shared_ptr<tCache> cache;
+  tCache* cache;
 
 };
 
