@@ -93,7 +93,10 @@ public:
   virtual void AnnotatedObjectInitialized(); // TODO: mark as override in gcc 4.7
 
   /*!
-   * XML Deserialization implementation.
+   * XML Deserialization implementation
+   *
+   * \param node Node to deserialize from
+   * \param finstruct_context Is deserialization performed in the context of finstruct/finstructable groups?
    */
   void Deserialize(const rrlib::xml::tNode& node, bool finstruct_context);
 
@@ -114,7 +117,7 @@ public:
     return *parameters[i];
   }
 
-  core::tFrameworkElement* GetAnnotated()
+  core::tFrameworkElement* GetAnnotated() const
   {
     return tAnnotation::GetAnnotated<core::tFrameworkElement>();
   }
@@ -126,6 +129,11 @@ public:
   {
     return create_action;
   }
+
+  /*!
+   * \return Description for log messages
+   */
+  virtual std::string GetLogDescription() const;
 
   /*!
    * Get or create StaticParameterList for Framework element

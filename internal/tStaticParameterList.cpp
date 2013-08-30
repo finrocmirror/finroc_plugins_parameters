@@ -33,6 +33,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "rrlib/rtti/rtti.h"
+#include <map>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -107,17 +108,82 @@ void tStaticParameterList::Clear()
 void tStaticParameterList::Deserialize(const rrlib::xml::tNode& node, bool finstruct_context)
 {
   size_t number_of_children = std::distance(node.ChildrenBegin(), node.ChildrenEnd());
+  bool print_loading_messages = false;
   if (number_of_children != Size())
   {
-    FINROC_LOG_PRINT(WARNING, "Parameter list size and number of xml parameters differ. Trying anyway");
+    FINROC_LOG_PRINT(WARNING, "Number of parameters in XML file differs from expected number of parameters.");
+    print_loading_messages = true;
   }
-  int count = std::min(number_of_children, Size());
-  rrlib::xml::tNode::const_iterator child = node.ChildrenBegin();
-  for (int i = 0; i < count; i++)
+
+  std::map<size_t, const rrlib::xml::tNode*> parameter_index_to_xml_node_map; // xml parameter index is index; value is matched static parameter in list; NULL if no match could be found
+  size_t xml_index = 0;
+  for (rrlib::xml::tNode::const_iterator child = node.ChildrenBegin(); child != node.ChildrenEnd(); ++child, ++xml_index)
+  {
+    if (child->Name() != "parameter")
+    {
+      FINROC_LOG_PRINT(WARNING, "Found entry with tag '", child->Name(), "' instead of 'parameter'. Ignoring.");
+      continue;
+    }
+
+    try
+    {
+      std::string xml_name = child->GetStringAttribute("name");
+      tStaticParameterImplementationBase* found = NULL;
+      for (size_t i = 0; i < this->Size(); i++)
+      {
+        if (xml_name == this->Get(i).GetName())
+        {
+          found = &(this->Get(i));
+          if (xml_index != i && (!print_loading_messages))
+          {
+            FINROC_LOG_PRINT(WARNING, "Parameter with name '", xml_name, "' found in XML file (expected: '", this->Get(xml_index).GetName(), "')");
+            print_loading_messages = true;
+          }
+          parameter_index_to_xml_node_map[i] = &(*child);
+          break;
+        }
+      }
+      if ((!found) && (!print_loading_messages))
+      {
+        FINROC_LOG_PRINT(WARNING, "Parameter with name '", xml_name, "' found in XML file (expected: '", this->Get(xml_index).GetName(), "')");
+        print_loading_messages = true;
+      }
+    }
+    catch (const rrlib::xml::tException& ex)
+    {
+      FINROC_LOG_PRINT(WARNING, "Found parameter without a name in XML file. Ignoring.");
+    }
+  }
+
+  if (print_loading_messages)
+  {
+    FINROC_LOG_PRINT(WARNING, "Loading parameters as follows:");
+  }
+  for (size_t i = 0; i < this->Size(); i++)
   {
     tStaticParameterImplementationBase& param = Get(i);
-    param.Deserialize(*child, finstruct_context);
-    ++child;
+    auto xml_node = parameter_index_to_xml_node_map.find(i);
+    bool apply_default = (xml_node == parameter_index_to_xml_node_map.end());
+    if (!apply_default)
+    {
+      if (print_loading_messages)
+      {
+        FINROC_LOG_PRINT(WARNING, "- ", param.GetName(), ": from XML parameter '", xml_node->second->GetStringAttribute("name"), "'");
+      }
+      try
+      {
+        param.Deserialize(*(xml_node->second), finstruct_context);
+      }
+      catch (const std::exception& e)
+      {
+        FINROC_LOG_PRINT(WARNING, "Could not deserialize parameter '", param.GetName(), "' from XML. Reason: ", e);
+        apply_default = true;
+      }
+    }
+    if (apply_default)
+    {
+      FINROC_LOG_PRINT(WARNING, "- ", param.GetName(), ": not modifying current value");
+    }
   }
 }
 
@@ -179,6 +245,16 @@ void tStaticParameterList::DoStaticParameterEvaluation(core::tFrameworkElement& 
       DoStaticParameterEvaluation(*attached_parameters[i]->GetParentList()->GetAnnotated());
     }
   }
+}
+
+std::string tStaticParameterList::GetLogDescription() const
+{
+  core::tFrameworkElement* annotated = this->GetAnnotated();
+  if (annotated)
+  {
+    return "Static Parameter List of " + annotated->GetQualifiedName();
+  }
+  return "Static Parameter List (not attached)";
 }
 
 tStaticParameterList& tStaticParameterList::GetOrCreate(core::tFrameworkElement& fe)
