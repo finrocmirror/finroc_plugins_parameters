@@ -112,7 +112,7 @@ public:
   tStaticParameter(const ARGS&... args) :
     implementation(NULL)
   {
-    data_ports::tPortCreationInfo<T> creation_info(args...);
+    core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>> creation_info(args...);
     implementation = tImplementation::CreateInstance(creation_info, false);
     assert(creation_info.parent != NULL);
     internal::tStaticParameterList::GetOrCreate(*creation_info.parent).Add(*implementation);

@@ -113,9 +113,9 @@ public:
    * numeric type: The first numeric argument is interpreted as default_value.
    */
   template<typename ... ARGS>
-  tParameter(const ARGS&... args) : implementation(data_ports::tPortCreationInfo<T>(args...))
+  tParameter(const ARGS&... args) : implementation(core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>>(args...))
   {
-    data_ports::tPortCreationInfo<T> creation_info(args...);
+    core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>> creation_info(args...);
     implementation.GetWrapped()->AddAnnotation(*(new internal::tParameterInfo()));
     SetConfigEntry(creation_info.config_entry);
   }

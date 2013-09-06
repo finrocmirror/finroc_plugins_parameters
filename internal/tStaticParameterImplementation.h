@@ -108,7 +108,9 @@ private:
 
   virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
   {
-    return new tStaticParameterImplementation(data_ports::tPortCreationInfo<T>(GetName()), false);
+    data_ports::tPortCreationInfo<T> creation_info;
+    creation_info.name = GetName();
+    return new tStaticParameterImplementation(creation_info, false);
   }
 };
 
@@ -162,7 +164,8 @@ protected:
 
   virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
   {
-    return new tStaticParameterImplementation(data_ports::tPortCreationInfo<T>(GetName(), unit), false);
+    return new tStaticParameterImplementation(
+             core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>>(GetName(), unit), false);
   }
 };
 
@@ -212,7 +215,8 @@ private:
 
   virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
   {
-    return new tBoundedNumericStaticParameterImplementation(data_ports::tPortCreationInfo<T>(this->GetName(), this->unit, bounds), false);
+    return new tBoundedNumericStaticParameterImplementation(
+             core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>>(this->GetName(), this->unit, bounds), false);
   }
 };
 
