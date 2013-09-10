@@ -44,6 +44,7 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
+#include "plugins/parameters/internal/tParameterCreationInfo.h"
 #include "plugins/parameters/internal/tStaticParameterImplementationBase.h"
 
 //----------------------------------------------------------------------
@@ -76,7 +77,7 @@ class tStaticParameterImplementation : public tStaticParameterImplementationBase
 //----------------------------------------------------------------------
 public:
 
-  static tStaticParameterImplementation* CreateInstance(const data_ports::tPortCreationInfo<T>& creation_info, bool constructor_prototype)
+  static tStaticParameterImplementation* CreateInstance(const internal::tParameterCreationInfo<T>& creation_info, bool constructor_prototype)
   {
     return new tStaticParameterImplementation(creation_info, constructor_prototype);
   }
@@ -89,6 +90,7 @@ public:
   inline void Set(const T& new_value)
   {
     ValuePointer()->template GetData<T>() = new_value;
+    tStaticParameterImplementationBase::NotifyChange();
   }
 
 //----------------------------------------------------------------------
@@ -96,7 +98,7 @@ public:
 //----------------------------------------------------------------------
 private:
 
-  tStaticParameterImplementation(const data_ports::tPortCreationInfo<T>& creation_info, bool constructor_prototype) :
+  tStaticParameterImplementation(const internal::tParameterCreationInfo<T>& creation_info, bool constructor_prototype) :
     tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<T>(), constructor_prototype, false, creation_info.config_entry)
   {
     if (creation_info.DefaultValueSet())
@@ -108,7 +110,7 @@ private:
 
   virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
   {
-    data_ports::tPortCreationInfo<T> creation_info;
+    internal::tParameterCreationInfo<T> creation_info;
     creation_info.name = GetName();
     return new tStaticParameterImplementation(creation_info, false);
   }
@@ -127,7 +129,7 @@ class tStaticParameterImplementation<T, true> : public tStaticParameterImplement
 //----------------------------------------------------------------------
 public:
 
-  static tStaticParameterImplementation* CreateInstance(const data_ports::tPortCreationInfo<T>& creation_info, bool constructor_prototype);
+  static tStaticParameterImplementation* CreateInstance(const internal::tParameterCreationInfo<T>& creation_info, bool constructor_prototype);
 
   T& Get()
   {
@@ -138,6 +140,7 @@ public:
   virtual void Set(T new_value)
   {
     tPortImplementation::Assign(ValuePointer()->template GetData<data_ports::numeric::tNumber>(), new_value, unit);
+    tStaticParameterImplementationBase::NotifyChange();
   }
 
 //----------------------------------------------------------------------
@@ -152,7 +155,7 @@ protected:
   T current_value_temp;
 
 
-  tStaticParameterImplementation(const data_ports::tPortCreationInfo<T>& creation_info, bool constructor_prototype) :
+  tStaticParameterImplementation(const internal::tParameterCreationInfo<T>& creation_info, bool constructor_prototype) :
     tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<data_ports::numeric::tNumber>(), constructor_prototype, false, creation_info.config_entry),
     unit(creation_info.unit)
   {
@@ -165,7 +168,7 @@ protected:
   virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
   {
     return new tStaticParameterImplementation(
-             core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>>(GetName(), unit), false);
+             core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(GetName(), unit), false);
   }
 };
 
@@ -179,7 +182,7 @@ class tBoundedNumericStaticParameterImplementation : public tStaticParameterImpl
 //----------------------------------------------------------------------
 public:
 
-  tBoundedNumericStaticParameterImplementation(const data_ports::tPortCreationInfo<T>& creation_info, bool constructor_prototype) :
+  tBoundedNumericStaticParameterImplementation(const internal::tParameterCreationInfo<T>& creation_info, bool constructor_prototype) :
     tBase(creation_info, constructor_prototype),
     bounds(creation_info.GetBounds())
   {
@@ -216,14 +219,14 @@ private:
   virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
   {
     return new tBoundedNumericStaticParameterImplementation(
-             core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>>(this->GetName(), this->unit, bounds), false);
+             core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(this->GetName(), this->unit, bounds), false);
   }
 };
 
 
 template <typename T>
 tStaticParameterImplementation<T, true>* tStaticParameterImplementation<T, true>::CreateInstance(
-  const data_ports::tPortCreationInfo<T>& creation_info, bool constructor_prototype)
+  const internal::tParameterCreationInfo<T>& creation_info, bool constructor_prototype)
 {
   if (creation_info.BoundsSet())
   {

@@ -46,6 +46,7 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
+#include "plugins/parameters/internal/tParameterCreationInfo.h"
 #include "plugins/parameters/internal/tParameterImplementation.h"
 #include "plugins/parameters/internal/tParameterInfo.h"
 
@@ -89,6 +90,9 @@ public:
   /*! Type T */
   typedef T tDataType;
 
+  /*! Bundles all possible constructor parameters of tParameter */
+  typedef internal::tParameterCreationInfo<T> tConstructorParameters;
+
   /*! Creates no wrapped parameter */
   tParameter() : implementation()
   {}
@@ -99,12 +103,10 @@ public:
    * The first string is interpreted as parameter name, the second possibly as config entry.
    * A framework element pointer is interpreted as parent.
    * tFrameworkElement::tFlags arguments are interpreted as flags.
-   * int argument is interpreted as queue length (ignored)
    * tBounds<T> are parameter's bounds.
    * tUnit argument is parameter's's unit.
-   * int16/short argument is interpreted as minimum network update interval (ignored)
    * const T& is interpreted as port's default value.
-   * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
+   * tParameterCreationInfo<T> argument is copied.
    *
    * This becomes a little tricky when parameter has numeric or string type.
    * There we have these rules:
@@ -115,7 +117,7 @@ public:
   template<typename ... ARGS>
   tParameter(const ARGS&... args) : implementation(core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>>(args...))
   {
-    core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>> creation_info(args...);
+    core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>> creation_info(args...);
     implementation.GetWrapped()->AddAnnotation(*(new internal::tParameterInfo()));
     SetConfigEntry(creation_info.config_entry);
   }

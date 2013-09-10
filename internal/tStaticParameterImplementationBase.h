@@ -44,6 +44,7 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
+#include "plugins/parameters/definitions.h"
 
 //----------------------------------------------------------------------
 // Namespace declaration
@@ -173,6 +174,14 @@ public:
   void LoadValue();
 
   /*!
+   * Should be called whenever the parameter's value may have changed.
+   * If it did and the change callback mode is set to ON_SET,
+   * the framework elements' OnStaticParameterChange() method will be called
+   * that this parameter is attached to.
+   */
+  void NotifyChange();
+
+  /*!
    * Reset "changed flag".
    * The current value will now be the one any new value is compared with when
    * checking whether value has changed.
@@ -187,6 +196,14 @@ public:
    * \param s Serialized as string
    */
   void Set(const std::string& s);
+
+  /*!
+   * \param change_callback Change callback setting to use
+   */
+  void SetChangeCallbackMode(tChangeCallback change_callback)
+  {
+    this->change_callback = change_callback;
+  }
 
   /*!
    * \param config_entry Place in Configuration tree, this parameter is configured from.
@@ -277,6 +294,9 @@ private:
 
   /*! List of attached parameters */
   std::vector<tStaticParameterImplementationBase*> attached_parameters;
+
+  /*! Settings with respect to change callbacks */
+  tChangeCallback change_callback;
 
 
   /*!

@@ -88,7 +88,8 @@ tStaticParameterImplementationBase::tStaticParameterImplementationBase(const std
   config_entry(config_entry),
   config_entry_set_by_finstruct(false),
   static_parameter_proxy(static_parameter_proxy),
-  attached_parameters()
+  attached_parameters(),
+  change_callback(tChangeCallback::ON_CHECK_ONLY)
 {
   if (!constructor_prototype)
   {
@@ -209,6 +210,7 @@ void tStaticParameterImplementationBase::Deserialize(const rrlib::xml::tNode& no
   }
 
   UpdateAndPossiblyLoad(command_line_option_tmp, config_entry_tmp);
+  NotifyChange();
 }
 
 void tStaticParameterImplementationBase::DeserializeValue(rrlib::serialization::tInputStream& is)
@@ -224,6 +226,7 @@ void tStaticParameterImplementationBase::DeserializeValue(rrlib::serialization::
       val = ValuePointer();
     }
     val->Deserialize(is, rrlib::serialization::tDataEncoding::XML);
+    NotifyChange();
   }
 }
 
@@ -310,6 +313,7 @@ void tStaticParameterImplementationBase::LoadValue()
           try
           {
             value->Deserialize(node);
+            NotifyChange();
           }
           catch (std::exception& e)
           {
@@ -318,6 +322,14 @@ void tStaticParameterImplementationBase::LoadValue()
         }
       }
     }
+  }
+}
+
+void tStaticParameterImplementationBase::NotifyChange()
+{
+  if ((change_callback == tChangeCallback::ON_SET) && parent_list)
+  {
+    tStaticParameterList::DoStaticParameterEvaluation(*parent_list->GetAnnotated());
   }
 }
 
@@ -399,6 +411,7 @@ void tStaticParameterImplementationBase::Set(const std::string& s)
 
   rrlib::serialization::tStringInputStream sis(s);
   val->Deserialize(sis);
+  NotifyChange();
 }
 
 void tStaticParameterImplementationBase::SetConfigEntry(const std::string& config_entry)

@@ -92,6 +92,9 @@ public:
   /*! Type T */
   typedef T tDataType;
 
+  /*! Bundles all possible constructor parameters of tStaticParameter */
+  typedef internal::tParameterCreationInfo<T> tConstructorParameters;
+
   /*!
    * Constructor takes variadic argument list... just any properties you want to assign to parameter.
    *
@@ -100,7 +103,7 @@ public:
    * tBounds<T> are parameter's bounds.
    * tUnit argument is parameter's unit.
    * const T& is interpreted as parameter's default value.
-   * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
+   * tChangeCallback can be specified - e.g. for immediate callback on parameter value change
    *
    * This becomes a little tricky when parameter has numeric or string type.
    * There we have these rules:
@@ -112,8 +115,9 @@ public:
   tStaticParameter(const ARGS&... args) :
     implementation(NULL)
   {
-    core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>> creation_info(args...);
+    core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>> creation_info(args...);
     implementation = tImplementation::CreateInstance(creation_info, false);
+    implementation->SetChangeCallbackMode(creation_info.change_callback);
     assert(creation_info.parent != NULL);
     internal::tStaticParameterList::GetOrCreate(*creation_info.parent).Add(*implementation);
   }
