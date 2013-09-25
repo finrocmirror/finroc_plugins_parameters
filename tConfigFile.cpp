@@ -34,7 +34,6 @@
 //----------------------------------------------------------------------
 #include "rrlib/rtti/rtti.h"
 #include "core/file_lookup.h"
-#include <boost/algorithm/string.hpp>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -61,6 +60,7 @@ namespace parameters
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+typedef rrlib::xml::tNode tXMLNode;
 
 //----------------------------------------------------------------------
 // Const values
@@ -110,6 +110,25 @@ tConfigFile::tConfigFile(const std::string& filename) :
   wrapped.AddRootNode(cXML_BRANCH_NAME);
 }
 
+rrlib::xml::tNode& tConfigFile::CreateEntry(const std::string& entry, bool leaf)
+{
+  if (!leaf)
+  {
+    std::pair<tXMLNode*, tXMLNode*> found = GetEntryImplementation(entry, wrapped.RootNode(), 0);
+    if (found.first)
+    {
+      // do we want to warn if node is a leaf node? - I currently do not think so
+      return *found.first;
+    }
+  }
+
+  size_t slash_index = entry.rfind('/');
+  tXMLNode& parent = (slash_index == std::string::npos || slash_index == 0) ? wrapped.RootNode() : CreateEntry(entry.substr(0, slash_index), false);
+  tXMLNode& created = parent.AddChildNode(leaf ? cXML_LEAF_NAME : cXML_BRANCH_NAME);
+  created.SetAttribute("name", (slash_index == std::string::npos) ? entry : entry.substr(slash_index + 1));
+  return created;
+}
+
 tConfigFile* tConfigFile::Find(const core::tFrameworkElement& element)
 {
   tConfigFile* config_file = element.GetAnnotation<tConfigFile>();
@@ -127,104 +146,116 @@ tConfigFile* tConfigFile::Find(const core::tFrameworkElement& element)
 
 rrlib::xml::tNode& tConfigFile::GetEntry(const std::string& entry, bool create)
 {
-  std::vector<std::string> nodes;
-  boost::split(nodes, entry, boost::is_any_of(cSEPARATOR));
-  size_t idx = (nodes.size() > 0 && nodes[0].length() == 0) ? 1 : 0; // if entry starts with '/', skip first empty string
-  rrlib::xml::tNode::iterator current = &wrapped.RootNode();
-  rrlib::xml::tNode::iterator parent = current;
-  bool created = false;
-  while (idx < nodes.size())
+  std::pair<tXMLNode*, tXMLNode*> found = GetEntryImplementation(entry, wrapped.RootNode(), 0);
+  if (!create)
   {
-    if (nodes[idx].length() == 0)
+    if (!found.first)
     {
-      FINROC_LOG_PRINT(WARNING, "Entry '", entry, "' is not clean. Skipping empty string now, but please fix this!");
-      idx++;
-      continue;
+      throw std::runtime_error("Config node not found: " + entry);
     }
-    bool found = false;
-    for (rrlib::xml::tNode::iterator child = current->ChildrenBegin(); child != current->ChildrenEnd(); ++child)
+    if (found.first->Name() != cXML_LEAF_NAME)
     {
-      if (boost::equals(cXML_BRANCH_NAME, child->Name()) || boost::equals(cXML_LEAF_NAME, child->Name()))
+      throw std::runtime_error("Config node is no leaf: " + entry);
+    }
+    return *found.first;
+  }
+
+  // create node...
+  if (found.first)
+  {
+    // recreate existing node
+    std::string name = found.first->GetStringAttribute("name");
+    found.second->RemoveChildNode(*found.first);
+    found.first = &(found.second->AddChildNode(cXML_LEAF_NAME));
+    found.first->SetAttribute("name", name);
+    return *found.first;
+  }
+  else
+  {
+    return CreateEntry(entry, true);
+  }
+}
+
+std::pair<tXMLNode*, tXMLNode*> tConfigFile::GetEntryImplementation(const std::string& entry, rrlib::xml::tNode& node, size_t entry_string_index)
+{
+  typedef std::pair<tXMLNode*, tXMLNode*> tResult;
+
+  if (entry_string_index >= entry.length())
+  {
+    return tResult(NULL, NULL);
+  }
+
+  // Check for slash at beginning
+  if (entry[entry_string_index] == '/')
+  {
+    if (entry_string_index > 0)
+    {
+      FINROC_LOG_PRINT(WARNING, "Entry '", entry, "' seems to be not clean (sequential slashes). Skipping one slash now, as this is typically intended. Please fix this!");
+    }
+    entry_string_index++;
+  }
+
+  // Search child nodes
+  for (rrlib::xml::tNode::iterator child = node.ChildrenBegin(); child != node.ChildrenEnd(); ++child)
+  {
+    if (child->Name() == cXML_BRANCH_NAME || child->Name() == cXML_LEAF_NAME)
+    {
+      try
       {
-        try
+        std::string name_attribute = child->GetStringAttribute("name");
+        if (entry.compare(entry_string_index, name_attribute.length(), name_attribute) == 0) // starts_with name attribute?
         {
-          if (boost::equals(nodes[idx], child->GetStringAttribute("name")))
+          size_t new_entry_string_index = entry_string_index + name_attribute.length();
+          if (new_entry_string_index != entry.length())
           {
-            idx++;
-            parent = current;
-            current = child;
-            found = true;
-            break;
+            if (entry[new_entry_string_index] == '/')
+            {
+              new_entry_string_index++;
+              tResult result = GetEntryImplementation(entry, *child, new_entry_string_index);
+              if (result.first)
+              {
+                return result;
+              }
+            }
+          }
+          else
+          {
+            return tResult(&(*child), &node);
           }
         }
-        catch (const std::exception& e)
-        {
-          FINROC_LOG_PRINT(WARNING, "tree node without name");
-        }
       }
-    }
-    if (!found)
-    {
-      if (create)
+      catch (const std::exception& e)
       {
-        parent = current;
-        current = &(current->AddChildNode((idx == nodes.size() - 1) ? cXML_LEAF_NAME : cXML_BRANCH_NAME));
-        created = true;
-        current->SetAttribute("name", nodes[idx]);
-        idx++;
-      }
-      else
-      {
-        throw std::runtime_error(std::string("Config node not found: ") + entry);
+        FINROC_LOG_PRINT(WARNING, "Encountered tree node without name");
       }
     }
   }
-  if (!boost::equals(cXML_LEAF_NAME, current->Name()))
-  {
-    throw std::runtime_error("Config node no leaf");
-  }
 
-  // Recreate node?
-  if (create && (!created))
-  {
-    parent->RemoveChildNode(*current);
-    current = &(parent->AddChildNode(cXML_LEAF_NAME));
-    current->SetAttribute("name", nodes[nodes.size() - 1]);
-  }
-
-  return *current;
+  // Okay, we did not find one
+  return tResult(NULL, NULL);
 }
 
 std::string tConfigFile::GetStringEntry(const std::string& entry)
 {
-  if (this->HasEntry(entry))
+  auto result = GetEntryImplementation(entry, wrapped.RootNode(), 0);
+  if (result.first)
   {
     try
     {
-      return GetEntry(entry, false).GetTextContent();
+      return result.first->GetTextContent();
     }
     catch (const std::exception& e)
     {
       return "";
     }
   }
-  else
-  {
-    return "";
-  }
+  return "";
 }
 
 bool tConfigFile::HasEntry(const std::string& entry)
 {
-  try
-  {
-    GetEntry(entry, false);
-  }
-  catch (const std::exception& e)
-  {
-    return false;
-  }
-  return true;
+  auto result = GetEntryImplementation(entry, wrapped.RootNode(), 0);
+  return result.first && (result.first->Name() == cXML_LEAF_NAME);
 }
 
 void tConfigFile::LoadParameterValues()
@@ -255,7 +286,7 @@ void tConfigFile::LoadParameterValues(core::tFrameworkElement& fe)
   }
 }
 
-void tConfigFile::SaveFile()
+void tConfigFile::SaveFile(const std::string& new_filename)
 {
   // first: update tree
   core::tFrameworkElement* ann = GetAnnotated<core::tFrameworkElement>();
@@ -284,11 +315,17 @@ void tConfigFile::SaveFile()
 
   try
   {
-    std::string save_to = core::GetFinrocFileToSaveTo(filename);
+    if (new_filename.length() > 0)
+    {
+      this->filename = new_filename;
+    }
+    std::string save_to = core::GetFinrocFileToSaveTo(this->filename);
     if (save_to.length() == 0)
     {
-      std::string save_to_alt = core::GetFinrocFileToSaveTo(boost::replace_all_copy(filename, "/", "_"));
-      FINROC_LOG_PRINT(ERROR, "There does not seem to be any suitable location for: '", filename, "' . For now, using '", save_to_alt, "'.");
+      std::string save_to_alt = save_to;
+      std::replace(save_to_alt.begin(), save_to_alt.end(), '/', '_'); // Replace '/' characters with '_'
+      save_to_alt = core::GetFinrocFileToSaveTo(save_to_alt);
+      FINROC_LOG_PRINT(ERROR, "There does not seem to be any suitable location for: '", this->filename, "' . For now, using '", save_to_alt, "'.");
       save_to = save_to_alt;
     }
 
@@ -323,7 +360,7 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
   std::string file = stream.ReadString();
   std::string content = stream.ReadString();
 
-  if (config_file.active && file.length() > 0 && content.length() == 0 && (!boost::equals(file, config_file.filename)))
+  if (config_file.active && file.length() > 0 && content.length() == 0 && (file != config_file.filename))
   {
     // load file
     if (core::FinrocFileExists(file))

@@ -149,8 +149,10 @@ public:
 
   /*!
    * Saves configuration file back to HDD
+   *
+   * \param new_filename Name of file to save to (if empty, preserves current file name)
    */
-  void SaveFile();
+  void SaveFile(const std::string& new_filename);
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -168,6 +170,24 @@ private:
 
   /*! Is config file active? (false when config file is deleted via finstruct) */
   bool active;
+
+
+  /*!
+   * \param entry Config entry that created node should have
+   * \param leaf Should created entry be a leaf node?
+   * \return Returns or creates node with the specified config entry - possibly recursively
+   */
+  rrlib::xml::tNode& CreateEntry(const std::string& entry, bool leaf);
+
+  /*!
+   * Implementation of GetEntry() - called recursively
+   *
+   * \param entry Entry
+   * \param node Current node
+   * \param entry_string_index Current index in entry string
+   * \return XMLNode representing entry (first) and its parent (second) - NULL, if it was not found
+   */
+  std::pair<rrlib::xml::tNode*, rrlib::xml::tNode*> GetEntryImplementation(const std::string& entry, rrlib::xml::tNode& node, size_t entry_string_index);
 
 };
 

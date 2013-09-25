@@ -32,7 +32,6 @@
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include <boost/algorithm/string.hpp>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -90,7 +89,7 @@ std::string tConfigNode::GetConfigNode(core::tFrameworkElement& fe)
     tConfigNode* cn = fe_ptr->GetAnnotation<tConfigNode>();
     if (cn)
     {
-      result = cn->node + (boost::ends_with(cn->node, "/") ? "" : "/") + result;
+      result = cn->node + (((*cn->node.rbegin()) == '/') ? "" : "/") + result;
       if (cn->node[0] == '/')
       {
         return result;
@@ -113,7 +112,7 @@ std::string tConfigNode::GetFullConfigEntry(core::tFrameworkElement& parent, con
     return config_entry;
   }
   std::string node = GetConfigNode(parent);
-  return node + (boost::ends_with(node, "/") ? "" : "/") + config_entry;
+  return node + (((*node.rbegin()) == '/') ? "" : "/") + config_entry;
 }
 
 void tConfigNode::SetConfigNode(core::tFrameworkElement& fe, const std::string& node)
@@ -122,7 +121,7 @@ void tConfigNode::SetConfigNode(core::tFrameworkElement& fe, const std::string& 
   tConfigNode* cn = fe.GetAnnotation<tConfigNode>();
   if (cn != NULL)
   {
-    if (boost::equals(cn->node, node))
+    if (cn->node == node)
     {
       return;
     }
