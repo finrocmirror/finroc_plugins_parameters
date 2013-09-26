@@ -114,11 +114,12 @@ rrlib::xml::tNode& tConfigFile::CreateEntry(const std::string& entry, bool leaf)
 {
   if (!leaf)
   {
-    std::pair<tXMLNode*, tXMLNode*> found = GetEntryImplementation(entry, wrapped.RootNode(), 0);
-    if (found.first)
+    std::vector<rrlib::xml::tNode*> result;
+    GetEntryImplementation(result, entry, wrapped.RootNode(), 0);
+    if (result.size() > 0)
     {
       // do we want to warn if node is a leaf node? - I currently do not think so
-      return *found.first;
+      return *result[0];
     }
   }
 
@@ -146,29 +147,36 @@ tConfigFile* tConfigFile::Find(const core::tFrameworkElement& element)
 
 rrlib::xml::tNode& tConfigFile::GetEntry(const std::string& entry, bool create)
 {
-  std::pair<tXMLNode*, tXMLNode*> found = GetEntryImplementation(entry, wrapped.RootNode(), 0);
+  std::vector<rrlib::xml::tNode*> result;
+  GetEntryImplementation(result, entry, wrapped.RootNode(), 0);
+  if (result.size() > 1)
+  {
+    FINROC_LOG_PRINT(WARNING, "There are ", result.size(), " entries in config file with the qualified name '", entry, "'. Using the first one.");
+  }
+
   if (!create)
   {
-    if (!found.first)
+    if (result.size() == 0)
     {
       throw std::runtime_error("Config node not found: " + entry);
     }
-    if (found.first->Name() != cXML_LEAF_NAME)
+    if (result[0]->Name() != cXML_LEAF_NAME)
     {
       throw std::runtime_error("Config node is no leaf: " + entry);
     }
-    return *found.first;
+    return *result[0];
   }
 
   // create node...
-  if (found.first)
+  if (result.size() > 0)
   {
     // recreate existing node
-    std::string name = found.first->GetStringAttribute("name");
-    found.second->RemoveChildNode(*found.first);
-    found.first = &(found.second->AddChildNode(cXML_LEAF_NAME));
-    found.first->SetAttribute("name", name);
-    return *found.first;
+    std::string name = result[0]->GetStringAttribute("name");
+    tXMLNode& parent = result[0]->Parent();
+    parent.RemoveChildNode(*result[0]);
+    tXMLNode& new_node = parent.AddChildNode(cXML_LEAF_NAME);
+    new_node.SetAttribute("name", name);
+    return new_node;
   }
   else
   {
@@ -176,13 +184,11 @@ rrlib::xml::tNode& tConfigFile::GetEntry(const std::string& entry, bool create)
   }
 }
 
-std::pair<tXMLNode*, tXMLNode*> tConfigFile::GetEntryImplementation(const std::string& entry, rrlib::xml::tNode& node, size_t entry_string_index)
+void tConfigFile::GetEntryImplementation(std::vector<rrlib::xml::tNode*>& result, const std::string& entry, rrlib::xml::tNode& node, size_t entry_string_index)
 {
-  typedef std::pair<tXMLNode*, tXMLNode*> tResult;
-
   if (entry_string_index >= entry.length())
   {
-    return tResult(NULL, NULL);
+    return;
   }
 
   // Check for slash at beginning
@@ -211,16 +217,12 @@ std::pair<tXMLNode*, tXMLNode*> tConfigFile::GetEntryImplementation(const std::s
             if (entry[new_entry_string_index] == '/')
             {
               new_entry_string_index++;
-              tResult result = GetEntryImplementation(entry, *child, new_entry_string_index);
-              if (result.first)
-              {
-                return result;
-              }
+              GetEntryImplementation(result, entry, *child, new_entry_string_index);
             }
           }
           else
           {
-            return tResult(&(*child), &node);
+            result.push_back(&(*child));
           }
         }
       }
@@ -231,31 +233,33 @@ std::pair<tXMLNode*, tXMLNode*> tConfigFile::GetEntryImplementation(const std::s
     }
   }
 
-  // Okay, we did not find one
-  return tResult(NULL, NULL);
+  // Okay, we did not find any more
 }
 
 std::string tConfigFile::GetStringEntry(const std::string& entry)
 {
-  auto result = GetEntryImplementation(entry, wrapped.RootNode(), 0);
-  if (result.first)
+  try
   {
-    try
-    {
-      return result.first->GetTextContent();
-    }
-    catch (const std::exception& e)
-    {
-      return "";
-    }
+    return GetEntry(entry).GetTextContent();
   }
-  return "";
+  catch (const std::exception& e)
+  {
+    return "";
+  }
 }
 
 bool tConfigFile::HasEntry(const std::string& entry)
 {
-  auto result = GetEntryImplementation(entry, wrapped.RootNode(), 0);
-  return result.first && (result.first->Name() == cXML_LEAF_NAME);
+  // TODO: could be implemented more efficiently
+  try
+  {
+    GetEntry(entry);
+    return true;
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
 }
 
 void tConfigFile::LoadParameterValues()

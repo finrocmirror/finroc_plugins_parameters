@@ -182,12 +182,12 @@ private:
   /*!
    * Implementation of GetEntry() - called recursively
    *
+   * \param result List that will contain the result(s) as additional entry/entries after the call
    * \param entry Entry
    * \param node Current node
    * \param entry_string_index Current index in entry string
-   * \return XMLNode representing entry (first) and its parent (second) - NULL, if it was not found
    */
-  std::pair<rrlib::xml::tNode*, rrlib::xml::tNode*> GetEntryImplementation(const std::string& entry, rrlib::xml::tNode& node, size_t entry_string_index);
+  void GetEntryImplementation(std::vector<rrlib::xml::tNode*>& result, const std::string& entry, rrlib::xml::tNode& node, size_t entry_string_index);
 
 };
 
