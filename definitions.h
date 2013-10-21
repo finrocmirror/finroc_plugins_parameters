@@ -59,7 +59,7 @@ enum class tChangeCallback
 {
   /*!
    * Default. Parameters are checked for changes (and the callback is possibly invoked)
-   * when the parent component is initialized or its "CheckParameters()" method is called.
+   * when the parent component is initialized or its "CheckStaticParameters()" method is called.
    */
   ON_CHECK_ONLY,
 
