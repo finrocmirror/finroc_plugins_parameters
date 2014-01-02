@@ -131,7 +131,7 @@ public:
     implementation.AddPortListener(listener);
   }
   template <typename TListener>
-  void AddPortListenerSimple(TListener& listener)
+  void AddListenerSimple(TListener& listener)
   {
     implementation.AddPortListenerSimple(listener);
   }
@@ -160,6 +160,17 @@ public:
   inline void Get(T& result) const
   {
     return implementation.Get(result);
+  }
+
+  /*!
+   * (throws a std::runtime_error if parameter is not bounded)
+   *
+   * \return Bounds as they are currently set
+   */
+  template <bool AVAILABLE = data_ports::tIsBoundable<T>::value>
+  inline typename std::enable_if<AVAILABLE, data_ports::tBounds<T>>::type GetBounds() const
+  {
+    return implementation.GetBounds();
   }
 
   /*!
