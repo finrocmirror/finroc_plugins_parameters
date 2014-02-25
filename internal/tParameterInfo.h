@@ -211,7 +211,7 @@ private:
   std::string finstruct_default;
 
 
-  virtual void AnnotatedObjectInitialized();
+  virtual void AnnotatedObjectInitialized() override;
 };
 
 rrlib::serialization::tOutputStream& operator << (rrlib::serialization::tOutputStream& stream, const tParameterInfo& parameter_info);

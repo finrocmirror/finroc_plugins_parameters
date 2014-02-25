@@ -108,7 +108,7 @@ private:
     }
   }
 
-  virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
+  virtual tStaticParameterImplementationBase* DeepCopy() override
   {
     internal::tParameterCreationInfo<T> creation_info;
     creation_info.name = GetName();
@@ -165,7 +165,7 @@ protected:
     }
   }
 
-  virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
+  virtual tStaticParameterImplementationBase* DeepCopy() override
   {
     return new tStaticParameterImplementation(
              core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(GetName(), unit), false);
@@ -188,7 +188,7 @@ public:
   {
   }
 
-  virtual void Set(T new_value) // TODO: mark with override when we use gcc 4.7
+  virtual void Set(T new_value) override
   {
     if (!bounds.InBounds(new_value))
     {
@@ -216,7 +216,7 @@ private:
   /*! Bounds of this parameter */
   data_ports::tBounds<T> bounds;
 
-  virtual tStaticParameterImplementationBase* DeepCopy() // TODO: mark with override when we use gcc 4.7
+  virtual tStaticParameterImplementationBase* DeepCopy() override
   {
     return new tBoundedNumericStaticParameterImplementation(
              core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(this->GetName(), this->unit, bounds), false);

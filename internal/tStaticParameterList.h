@@ -90,7 +90,7 @@ public:
    */
   void Add(tStaticParameterImplementationBase& param);
 
-  virtual void AnnotatedObjectInitialized(); // TODO: mark as override in gcc 4.7
+  virtual void AnnotatedObjectInitialized() override;
 
   /*!
    * XML Deserialization implementation
@@ -133,7 +133,7 @@ public:
   /*!
    * \return Description for log messages
    */
-  virtual std::string GetLogDescription() const;
+  std::string GetLogDescription() const;
 
   /*!
    * Get or create StaticParameterList for Framework element
