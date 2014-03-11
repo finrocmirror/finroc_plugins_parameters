@@ -99,6 +99,8 @@ public:
    * \param entry Entry
    * \param create (Re)create entry node?
    * \return XMLNode representing entry
+   *
+   * \throw Throws std::runtime_error if entry cannot be found
    */
   rrlib::xml::tNode& GetEntry(const std::string& entry, bool create = false);
 
