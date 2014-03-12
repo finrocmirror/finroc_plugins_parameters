@@ -80,6 +80,8 @@ class tConfigurablePlugin : public core::tPlugin
 //----------------------------------------------------------------------
 public:
 
+  tConfigurablePlugin();
+
   /**
    * Parameter classes to use in plugin.
    * They are non-copyable and should be created as plain member variables of a plugin.
@@ -127,8 +129,6 @@ private:
   /*! Framework element that contains parameters */
   core::tFrameworkElement* parameter_element;
 
-
-  tConfigurablePlugin();
 
   /*! Framework element to attach parameters to */
   core::tFrameworkElement& GetParameterElement();
