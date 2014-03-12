@@ -115,6 +115,14 @@ public:
    */
   virtual const char* GetId() = 0;
 
+  /*!
+   * \return True after Init() has been called (true when Init(tNode) is called)
+   */
+  bool IsInitialized() const
+  {
+    return initialized;
+  }
+
 //----------------------------------------------------------------------
 // Private fields and methods
 //----------------------------------------------------------------------
@@ -148,14 +156,6 @@ private:
    * Loads parameter values from config file for all parameters created so far
    */
   void LoadParameterValues();
-
-  /*!
-   * \return True after Init() has been called (true when Init(tNode) is called)
-   */
-  bool IsInitialized() const
-  {
-    return initialized;
-  }
 
 
   /*!
@@ -193,7 +193,7 @@ private:
       }
       else
       {
-        elements_to_create.emplace_back(this, creation_info);
+        plugin->elements_to_create.emplace_back(this, creation_info);
       }
     }
 
@@ -201,14 +201,11 @@ private:
 
     virtual void CreateFinrocElement(core::tAbstractPortCreationInfo& creation_info) override
     {
-      if (creation_info)
+      creation_info.parent = &(this->plugin.GetParameterElement());
+      static_cast<BASE&>(*this) = BASE(static_cast<tCreationInfo&>(creation_info));
+      if (plugin.IsInitialized())
       {
-        creation_info.parent = &(this->plugin.GetParameterElement());
-        *this = BASE(static_cast<tCreationInfo&>(creation_info));
-        if (plugin.IsInitialized())
-        {
-          plugin.LoadParameterValues();
-        }
+        plugin.LoadParameterValues();
       }
     }
   };
