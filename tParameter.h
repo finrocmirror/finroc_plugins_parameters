@@ -75,7 +75,7 @@ namespace parameters
 template <typename T>
 class tParameter
 {
-  typedef internal::tParameterImplementation < T, data_ports::tIsNumeric<T>::value || std::is_same<bool, T>::value > tImplementation;
+  typedef internal::tParameterImplementation < T, data_ports::IsNumeric<T>::value || std::is_same<bool, T>::value > tImplementation;
 
   typedef data_ports::api::tPortImplementation<T, data_ports::api::tPortImplementationTypeTrait<T>::type> tPortImplementation;
 
@@ -167,7 +167,7 @@ public:
    *
    * \return Bounds as they are currently set
    */
-  template <bool AVAILABLE = data_ports::tIsBoundable<T>::value>
+  template <bool AVAILABLE = data_ports::IsBoundable<T>::value>
   inline typename std::enable_if<AVAILABLE, data_ports::tBounds<T>>::type GetBounds() const
   {
     return implementation.GetBounds();

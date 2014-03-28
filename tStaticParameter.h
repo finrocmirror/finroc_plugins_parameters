@@ -77,12 +77,12 @@ namespace parameters
 template <typename T>
 class tStaticParameter
 {
-  static_assert(rrlib::serialization::tIsXMLSerializable<T>::value, "T has to be serializable to XML.");
+  static_assert(rrlib::serialization::IsXMLSerializable<T>::value, "T has to be serializable to XML.");
 
 protected:
 
   /*! Class that contains actual implementation of most functionality */
-  typedef internal::tStaticParameterImplementation<T, data_ports::tIsNumeric<T>::value> tImplementation;
+  typedef internal::tStaticParameterImplementation<T, data_ports::IsNumeric<T>::value> tImplementation;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
