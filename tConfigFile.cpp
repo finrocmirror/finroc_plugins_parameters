@@ -89,7 +89,7 @@ tConfigFile::tConfigFile() :
   wrapped.AddRootNode(cXML_BRANCH_NAME);
 }
 
-tConfigFile::tConfigFile(const std::string& filename) :
+tConfigFile::tConfigFile(const std::string& filename, bool optional) :
   wrapped(),
   filename(filename),
   active(true)
@@ -105,6 +105,10 @@ tConfigFile::tConfigFile(const std::string& filename) :
     {
       FINROC_LOG_PRINT(ERROR, e);
     }
+  }
+  else if (!optional)
+  {
+    FINROC_LOG_PRINT(WARNING, "Specified config file not found: ", filename);
   }
   wrapped = rrlib::xml::tDocument();
   wrapped.AddRootNode(cXML_BRANCH_NAME);

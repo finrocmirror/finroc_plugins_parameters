@@ -76,9 +76,10 @@ class tConfigFile : public core::tAnnotation
 public:
 
   /*!
-   * \param filename File name of configuration file (loaded if it exists already).
+   * \param filename File name of configuration file (loaded if it exists)
+   * \param optional Is this an optional config file? (if false and specified file does not exists, prints a warning)
    */
-  tConfigFile(const std::string& filename);
+  tConfigFile(const std::string& filename, bool optional = false);
 
   /*!
    * Create empty config file with no filename (should only be used to deserialize from stream)
