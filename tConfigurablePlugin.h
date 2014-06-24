@@ -144,6 +144,7 @@ private:
   // should not be overriden again (see below)
   virtual void Init() override;
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   /*!
    * Called on initialization (after parameters have been loaded)
    * Should be overridden instead of plain Init()
@@ -151,6 +152,7 @@ private:
    * \param config_node Configuration node if one for this plugin was provided
    */
   virtual void Init(rrlib::xml::tNode* config_node) = 0;
+#endif
 
   /*!
    * Loads parameter values from config file for all parameters created so far

@@ -94,6 +94,7 @@ public:
    */
   static tConfigFile* Find(const core::tFrameworkElement& element);
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   /*!
    * Get entry from configuration file
    *
@@ -104,6 +105,7 @@ public:
    * \throw Throws std::runtime_error if entry cannot be found
    */
   rrlib::xml::tNode& GetEntry(const std::string& entry, bool create = false);
+#endif
 
   /*!
    * \return Filename of current config file
@@ -165,8 +167,10 @@ private:
   friend rrlib::serialization::tOutputStream& operator << (rrlib::serialization::tOutputStream& stream, const tConfigFile& file);
   friend rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStream& stream, tConfigFile& file);
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   /*! (Wrapped) XML document */
   rrlib::xml::tDocument wrapped;
+#endif
 
   /*! File name of configuration file */
   std::string filename;
@@ -174,7 +178,7 @@ private:
   /*! Is config file active? (false when config file is deleted via finstruct) */
   bool active;
 
-
+#ifdef _LIB_RRLIB_XML_PRESENT_
   /*!
    * \param entry Config entry that created node should have
    * \param leaf Should created entry be a leaf node?
@@ -191,6 +195,7 @@ private:
    * \param entry_string_index Current index in entry string
    */
   void GetEntryImplementation(std::vector<rrlib::xml::tNode*>& result, const std::string& entry, rrlib::xml::tNode& node, size_t entry_string_index);
+#endif
 
 };
 

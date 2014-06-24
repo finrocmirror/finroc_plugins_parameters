@@ -104,7 +104,9 @@ public:
 
   void Deserialize(rrlib::serialization::tInputStream& is);
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   void Deserialize(const rrlib::xml::tNode& node, bool finstruct_context);
+#endif
 
   /*!
    * Deserializes value from stream
@@ -190,7 +192,9 @@ public:
 
   void Serialize(rrlib::serialization::tOutputStream& os) const;
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   void Serialize(rrlib::xml::tNode& node, bool finstruct_context) const;
+#endif
 
   /*!
    * \param s Serialized as string

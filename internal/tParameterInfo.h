@@ -79,7 +79,9 @@ public:
 
   tParameterInfo();
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   void Deserialize(const rrlib::xml::tNode& node, bool finstruct_context, bool include_commmand_line);
+#endif
 
   /*!
    * \return Command line option to set this parameter
@@ -153,7 +155,9 @@ public:
    */
   void SaveValue();
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   void Serialize(rrlib::xml::tNode& node, bool finstruct_context, bool include_command_line) const;
+#endif
 
   /*!
    * \param commandLineOption Command line option to set this parameter

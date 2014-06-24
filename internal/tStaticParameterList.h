@@ -92,6 +92,7 @@ public:
 
   virtual void AnnotatedObjectInitialized() override;
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   /*!
    * XML Deserialization implementation
    *
@@ -99,6 +100,7 @@ public:
    * \param finstruct_context Is deserialization performed in the context of finstruct/finstructable groups?
    */
   void Deserialize(const rrlib::xml::tNode& node, bool finstruct_context);
+#endif
 
   /*!
    * Trigger evaluation of static parameters in this framework element and all of its children.
@@ -143,10 +145,12 @@ public:
    */
   static tStaticParameterList& GetOrCreate(core::tFrameworkElement& fe);
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
   /*!
    * XML Serialization implementation.
    */
   void Serialize(rrlib::xml::tNode& node, bool finstruct_context) const;
+#endif
 
   /*!
    * \param create_action CreateModuleAction that was used to create framework element
@@ -186,8 +190,10 @@ private:
 
 rrlib::serialization::tOutputStream& operator << (rrlib::serialization::tOutputStream& stream, const tStaticParameterList& list);
 rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStream& stream, tStaticParameterList& list);
+#ifdef _LIB_RRLIB_XML_PRESENT_
 rrlib::xml::tNode& operator << (rrlib::xml::tNode& node, const tStaticParameterList& list);
 const rrlib::xml::tNode& operator >> (const rrlib::xml::tNode& node, tStaticParameterList& list);
+#endif
 
 //----------------------------------------------------------------------
 // End of namespace declaration

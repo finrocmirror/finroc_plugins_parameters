@@ -100,6 +100,7 @@ void tConfigurablePlugin::Init()
   initialized = true;
 
   // Call Init
+#ifdef _LIB_RRLIB_XML_PRESENT_
   tConfigFile* config_file = tConfigFile::Find(GetParameterElement());
   if (config_file)
   {
@@ -113,6 +114,7 @@ void tConfigurablePlugin::Init()
       Init(nullptr);
     }
   }
+#endif
 }
 
 void tConfigurablePlugin::LoadParameterValues()

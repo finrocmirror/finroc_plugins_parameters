@@ -165,6 +165,7 @@ void tStaticParameterImplementationBase::Deserialize(rrlib::serialization::tInpu
   }
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 void tStaticParameterImplementationBase::Deserialize(const rrlib::xml::tNode& node, bool finstruct_context)
 {
   rrlib::rtti::tType dt = type;
@@ -212,6 +213,7 @@ void tStaticParameterImplementationBase::Deserialize(const rrlib::xml::tNode& no
   UpdateAndPossiblyLoad(command_line_option_tmp, config_entry_tmp);
   NotifyChange();
 }
+#endif
 
 void tStaticParameterImplementationBase::DeserializeValue(rrlib::serialization::tInputStream& is)
 {
@@ -309,6 +311,7 @@ void tStaticParameterImplementationBase::LoadValue()
       {
         if (cf->HasEntry(full_config_entry))
         {
+#ifdef _LIB_RRLIB_XML_PRESENT_
           rrlib::xml::tNode& node = cf->GetEntry(full_config_entry, false);
           try
           {
@@ -319,6 +322,7 @@ void tStaticParameterImplementationBase::LoadValue()
           {
             FINROC_LOG_PRINT(ERROR, "Failed to load parameter '", GetName(), "' from config entry '", full_config_entry, "': ", e);
           }
+#endif
         }
       }
     }
@@ -370,6 +374,7 @@ void tStaticParameterImplementationBase::Serialize(rrlib::serialization::tOutput
   }
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 void tStaticParameterImplementationBase::Serialize(rrlib::xml::tNode& node, bool finstruct_context) const
 {
   assert(!(node.HasAttribute("type") || node.HasAttribute("cmdline") || node.HasAttribute("config") || node.HasAttribute("attachouter")));
@@ -397,6 +402,7 @@ void tStaticParameterImplementationBase::Serialize(rrlib::xml::tNode& node, bool
     node.SetAttribute("config", config_entry);
   }
 }
+#endif
 
 void tStaticParameterImplementationBase::Set(const std::string& s)
 {

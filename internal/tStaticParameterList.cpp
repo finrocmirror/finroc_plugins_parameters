@@ -105,6 +105,7 @@ void tStaticParameterList::Clear()
   parameters.clear();
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 void tStaticParameterList::Deserialize(const rrlib::xml::tNode& node, bool finstruct_context)
 {
   size_t number_of_children = std::distance(node.ChildrenBegin(), node.ChildrenEnd());
@@ -186,6 +187,7 @@ void tStaticParameterList::Deserialize(const rrlib::xml::tNode& node, bool finst
     }
   }
 }
+#endif
 
 void tStaticParameterList::DoStaticParameterEvaluation(core::tFrameworkElement& fe)
 {
@@ -268,6 +270,7 @@ tStaticParameterList& tStaticParameterList::GetOrCreate(core::tFrameworkElement&
   return *result;
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 void tStaticParameterList::Serialize(rrlib::xml::tNode& node, bool finstruct_context) const
 {
   for (size_t i = 0u; i < Size(); i++)
@@ -278,6 +281,7 @@ void tStaticParameterList::Serialize(rrlib::xml::tNode& node, bool finstruct_con
     param.Serialize(child, finstruct_context);
   }
 }
+#endif
 
 rrlib::serialization::tOutputStream& operator << (rrlib::serialization::tOutputStream& stream, const tStaticParameterList& list)
 {
@@ -313,6 +317,7 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
   return stream;
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 rrlib::xml::tNode& operator << (rrlib::xml::tNode& node, const tStaticParameterList& list)
 {
   list.Serialize(node, false);
@@ -324,6 +329,7 @@ const rrlib::xml::tNode& operator >> (const rrlib::xml::tNode& node, tStaticPara
   list.Deserialize(node, false);
   return node;
 }
+#endif
 
 //----------------------------------------------------------------------
 // End of namespace declaration

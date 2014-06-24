@@ -60,6 +60,7 @@ namespace parameters
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+#ifdef _LIB_RRLIB_XML_PRESENT_
 typedef rrlib::xml::tNode tXMLNode;
 
 //----------------------------------------------------------------------
@@ -73,6 +74,7 @@ static const std::string cXML_BRANCH_NAME("node");
 
 /*! Leaf name in XML */
 static const std::string cXML_LEAF_NAME("value");
+#endif
 
 /*! Initializes annotation type so that it can be transferred to finstruct */
 static rrlib::rtti::tDataType<tConfigFile> cTYPE;
@@ -82,18 +84,25 @@ static rrlib::rtti::tDataType<tConfigFile> cTYPE;
 //----------------------------------------------------------------------
 
 tConfigFile::tConfigFile() :
+#ifdef _LIB_RRLIB_XML_PRESENT_
   wrapped(),
+#endif
   filename(),
   active(true)
 {
+#ifdef _LIB_RRLIB_XML_PRESENT_
   wrapped.AddRootNode(cXML_BRANCH_NAME);
+#endif
 }
 
 tConfigFile::tConfigFile(const std::string& filename, bool optional) :
+#ifdef _LIB_RRLIB_XML_PRESENT_
   wrapped(),
+#endif
   filename(filename),
   active(true)
 {
+#ifdef _LIB_RRLIB_XML_PRESENT_
   if (core::FinrocFileExists(filename))
   {
     try
@@ -112,8 +121,10 @@ tConfigFile::tConfigFile(const std::string& filename, bool optional) :
   }
   wrapped = rrlib::xml::tDocument();
   wrapped.AddRootNode(cXML_BRANCH_NAME);
+#endif
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 rrlib::xml::tNode& tConfigFile::CreateEntry(const std::string& entry, bool leaf)
 {
   if (!leaf)
@@ -133,6 +144,7 @@ rrlib::xml::tNode& tConfigFile::CreateEntry(const std::string& entry, bool leaf)
   created.SetAttribute("name", (slash_index == std::string::npos) ? entry : entry.substr(slash_index + 1));
   return created;
 }
+#endif
 
 tConfigFile* tConfigFile::Find(const core::tFrameworkElement& element)
 {
@@ -149,6 +161,7 @@ tConfigFile* tConfigFile::Find(const core::tFrameworkElement& element)
   return NULL;
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 rrlib::xml::tNode& tConfigFile::GetEntry(const std::string& entry, bool create)
 {
   std::vector<rrlib::xml::tNode*> result;
@@ -239,9 +252,11 @@ void tConfigFile::GetEntryImplementation(std::vector<rrlib::xml::tNode*>& result
 
   // Okay, we did not find any more
 }
+#endif
 
 std::string tConfigFile::GetStringEntry(const std::string& entry)
 {
+#ifdef _LIB_RRLIB_XML_PRESENT_
   try
   {
     return GetEntry(entry).GetTextContent();
@@ -250,10 +265,14 @@ std::string tConfigFile::GetStringEntry(const std::string& entry)
   {
     return "";
   }
+#else
+  return "";
+#endif
 }
 
 bool tConfigFile::HasEntry(const std::string& entry)
 {
+#ifdef _LIB_RRLIB_XML_PRESENT_
   // TODO: could be implemented more efficiently
   try
   {
@@ -264,6 +283,9 @@ bool tConfigFile::HasEntry(const std::string& entry)
   {
     return false;
   }
+#else
+  return false;
+#endif
 }
 
 void tConfigFile::LoadParameterValues()
@@ -296,6 +318,7 @@ void tConfigFile::LoadParameterValues(core::tFrameworkElement& fe)
 
 void tConfigFile::SaveFile(const std::string& new_filename)
 {
+#ifdef _LIB_RRLIB_XML_PRESENT_
   // first: update tree
   core::tFrameworkElement* ann = GetAnnotated<core::tFrameworkElement>();
   assert(ann);
@@ -344,10 +367,12 @@ void tConfigFile::SaveFile(const std::string& new_filename)
   {
     FINROC_LOG_PRINT(ERROR, e);
   }
+#endif
 }
 
 rrlib::serialization::tOutputStream& operator << (rrlib::serialization::tOutputStream& stream, const tConfigFile& config_file)
 {
+#ifdef _LIB_RRLIB_XML_PRESENT_
   stream.WriteBoolean(config_file.IsActive());
   stream.WriteString(config_file.GetFilename());
 
@@ -359,11 +384,13 @@ rrlib::serialization::tOutputStream& operator << (rrlib::serialization::tOutputS
   {
     FINROC_LOG_PRINT(ERROR, e); // Should never occur
   }
+#endif
   return stream;
 }
 
 rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStream& stream, tConfigFile& config_file)
 {
+#ifdef _LIB_RRLIB_XML_PRESENT_
   config_file.active = stream.ReadBoolean();
   std::string file = stream.ReadString();
   std::string content = stream.ReadString();
@@ -409,6 +436,7 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
       FINROC_LOG_PRINT(ERROR, e);
     }
   }
+#endif
   return stream;
 }
 

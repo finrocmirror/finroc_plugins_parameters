@@ -96,6 +96,7 @@ void tParameterInfo::AnnotatedObjectInitialized()
   }
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 void tParameterInfo::Deserialize(const rrlib::xml::tNode& node, bool finstruct_context, bool include_commmand_line)
 {
   if (node.HasAttribute("config"))
@@ -127,6 +128,7 @@ void tParameterInfo::Deserialize(const rrlib::xml::tNode& node, bool finstruct_c
     finstruct_default = "";
   }
 }
+#endif
 
 bool tParameterInfo::IsFinstructableGroupResponsibleForConfigFileConnections(const core::tFrameworkElement& finstructable_group, const core::tFrameworkElement& ap)
 {
@@ -198,6 +200,7 @@ void tParameterInfo::LoadValue(bool ignore_ready)
         std::string full_config_entry = tConfigNode::GetFullConfigEntry(*ann, config_entry);
         if (cf->HasEntry(full_config_entry))
         {
+#ifdef _LIB_RRLIB_XML_PRESENT_
           rrlib::xml::tNode& node = cf->GetEntry(full_config_entry, false);
           if (data_ports::IsDataFlowType(ann->GetDataType()))
           {
@@ -223,6 +226,7 @@ void tParameterInfo::LoadValue(bool ignore_ready)
           {
             throw std::runtime_error("Port Type not supported as a parameter");
           }
+#endif
         }
       }
 
@@ -288,10 +292,12 @@ void tParameterInfo::SaveValue()
 
       if (!is_default)
       {
+#ifdef _LIB_RRLIB_XML_PRESENT_
         rrlib::xml::tNode& node = cf->GetEntry(config_entry, true);
         std::unique_ptr<rrlib::rtti::tGenericObject> current_value(port.GetDataType().CreateInstanceGeneric());
         port.Get(*current_value);
         current_value->Serialize(node);
+#endif
       }
     }
   }
@@ -301,6 +307,7 @@ void tParameterInfo::SaveValue()
   }
 }
 
+#ifdef _LIB_RRLIB_XML_PRESENT_
 void tParameterInfo::Serialize(rrlib::xml::tNode& node, bool finstruct_context, bool include_command_line) const
 {
   assert(!(node.HasAttribute("default") || node.HasAttribute("cmdline") || node.HasAttribute("config")));
@@ -320,6 +327,7 @@ void tParameterInfo::Serialize(rrlib::xml::tNode& node, bool finstruct_context, 
     node.SetAttribute("default", finstruct_default);
   }
 }
+#endif
 
 void tParameterInfo::SetConfigEntry(const std::string& config_entry, bool finstruct_set)
 {
