@@ -108,12 +108,10 @@ void tConfigurablePlugin::Init()
     if (config_file->HasEntry(config_entry))
     {
       Init(&config_file->GetEntry(config_entry));
-    }
-    else
-    {
-      Init(nullptr);
+      return;
     }
   }
+  Init(nullptr);
 #endif
 }
 
