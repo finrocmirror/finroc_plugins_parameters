@@ -132,7 +132,7 @@ private:
   bool initialized;
 
   /*! Contains vector with Finroc elements to be created */
-  std::vector<std::pair<tParameterBase*, std::shared_ptr<core::tAbstractPortCreationInfo>>> elements_to_create;
+  std::vector<tParameterBase*> elements_to_create;
 
   /*! Framework element that contains parameters */
   core::tFrameworkElement* parameter_element;
@@ -171,7 +171,7 @@ private:
 
     tParameterBase(tConfigurablePlugin& plugin) : plugin(plugin) {}
 
-    virtual void CreateFinrocElement(core::tAbstractPortCreationInfo& creation_info) = 0;
+    virtual void CreateFinrocElement() = 0;
   };
 
   /*!
@@ -188,23 +188,39 @@ private:
       : BASE(),
         tParameterBase(*plugin)
     {
-      std::shared_ptr<tCreationInfo> creation_info(new tCreationInfo(args...));
+      creation_info.reset(new tCreationInfo(args...));
       if (plugin->IsInitialized())
       {
-        CreateFinrocElement(*creation_info);
+        CreateFinrocElement();
+        creation_info.reset();
       }
       else
       {
-        plugin->elements_to_create.emplace_back(this, creation_info);
+        plugin->elements_to_create.emplace_back(this);
+      }
+    }
+
+    void Set(const T& t)
+    {
+      if (!creation_info)
+      {
+        BASE::Set(t);
+      }
+      else
+      {
+        creation_info->SetDefault(t, true);
       }
     }
 
   private:
 
-    virtual void CreateFinrocElement(core::tAbstractPortCreationInfo& creation_info) override
+    std::unique_ptr<tCreationInfo> creation_info;
+
+    virtual void CreateFinrocElement() override
     {
-      creation_info.parent = &(this->plugin.GetParameterElement());
-      static_cast<BASE&>(*this) = BASE(static_cast<tCreationInfo&>(creation_info));
+      creation_info->parent = &(this->plugin.GetParameterElement());
+      static_cast<BASE&>(*this) = BASE(static_cast<tCreationInfo&>(*creation_info));
+      creation_info.reset();
       if (plugin.IsInitialized())
       {
         plugin.LoadParameterValues();

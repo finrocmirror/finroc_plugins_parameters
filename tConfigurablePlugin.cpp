@@ -90,7 +90,7 @@ void tConfigurablePlugin::Init()
   // Create parameters
   for (auto it = elements_to_create.begin(); it != elements_to_create.end(); ++it)
   {
-    it->first->CreateFinrocElement(*it->second);
+    (*it)->CreateFinrocElement();
   }
   elements_to_create.clear();
   elements_to_create.shrink_to_fit(); // vector will not be used anymore
