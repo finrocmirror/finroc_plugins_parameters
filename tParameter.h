@@ -183,6 +183,14 @@ public:
   }
 
   /*!
+   * \return Name of wrapped framework element (see tFrameworkElement::GetName())
+   */
+  inline const tString& GetName() const
+  {
+    return implementation.GetName();
+  }
+
+  /*!
    * Gets Port's current value in buffer
    *
    * \return Buffer with port's current value with read lock.

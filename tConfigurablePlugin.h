@@ -80,7 +80,10 @@ class tConfigurablePlugin : public core::tPlugin
 //----------------------------------------------------------------------
 public:
 
-  tConfigurablePlugin();
+  /*!
+   * \param name Unique name of plugin. On Linux platforms, it should be identical with repository and .so file names (e.g. "tcp" for finroc_plugins_tcp and libfinroc_plugins_tcp.so).
+   */
+  tConfigurablePlugin(const char* name);
 
   /**
    * Parameter classes to use in plugin.
@@ -88,6 +91,7 @@ public:
    * Use e.g. unique_ptr to put them in a vector.
    *
    * The first constructor argument must be a pointer to this plugin.
+   * Config entries may not be nested.
    * Apart from that, they are used the same way as the plain parameter classes.
    * Constructors take a variadic argument list... just any properties you want to assign to parameter.
    *
@@ -111,17 +115,43 @@ public:
   using tStaticParameter = tParameterImplementation<T, finroc::parameters::tStaticParameter<T>>;
 
   /*!
-   * \return Unique identification of plugin (typically, the plugin name should be used - e.g. "tcp")
-   */
-  virtual const char* GetId() = 0;
-
-  /*!
    * \return True after Init() has been called (true when Init(tNode) is called)
    */
   bool IsInitialized() const
   {
     return initialized;
   }
+
+#ifdef _LIB_RRLIB_XML_PRESENT_
+  /*!
+   * \return Pointer to configuration file for loading and configuring configurable plugins if one was set and found. nullptr otherwise.
+   */
+  static rrlib::xml::tNode* GetConfigRootNode();
+
+  /*!
+   * Returns XML node to get default parameter value from - if such a node exists
+   *
+   * \param config_entry Config entry of parameter
+   * \return Node for specified config entry if one exists - otherwise nullptr
+   */
+  rrlib::xml::tNode* GetParameterNode(const std::string& config_entry);
+
+  /*!
+   * \returns Return XML node to configure plugin from if one such node exists. nullptr otherwise.
+   */
+  rrlib::xml::tNode* GetPluginConfigNode();
+
+#endif
+
+  /*!
+   * Set configuration file to use for loading and configuring configurable plugins.
+   * This must be called before tRuntimeEnvironment::GetInstance() to have an effect
+   * (if configurable plugins were already initialized, a warning is displayed).
+   *
+   * \param file_name File name of config file to use (loaded if it exists)
+   * \param root_node Path to node in config file that is the root node
+   */
+  static void SetConfigFile(const std::string& file_name);
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -141,6 +171,7 @@ private:
   /*! Framework element to attach parameters to */
   core::tFrameworkElement& GetParameterElement();
 
+
   // should not be overriden again (see below)
   virtual void Init() override;
 
@@ -153,11 +184,6 @@ private:
    */
   virtual void Init(rrlib::xml::tNode* config_node) = 0;
 #endif
-
-  /*!
-   * Loads parameter values from config file for all parameters created so far
-   */
-  void LoadParameterValues();
 
 
   /*!
@@ -221,10 +247,16 @@ private:
       creation_info->parent = &(this->plugin.GetParameterElement());
       static_cast<BASE&>(*this) = BASE(static_cast<tCreationInfo&>(*creation_info));
       creation_info.reset();
-      if (plugin.IsInitialized())
+#ifdef _LIB_RRLIB_XML_PRESENT_
+      rrlib::xml::tNode* node = this->plugin.GetParameterNode(this->GetConfigEntry().length() ? this->GetConfigEntry() : this->GetName());
+      if (node)
       {
-        plugin.LoadParameterValues();
+        T t;
+        (*node) >> t;
+        Set(t);
       }
+#endif
+      this->SetConfigEntry("");
     }
   };
 };

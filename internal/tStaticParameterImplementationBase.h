@@ -121,7 +121,7 @@ public:
   void GetAllAttachedParameters(std::vector<tStaticParameterImplementationBase*>& result);
 
   /*!
-   * \return Place in Configuration tree, this parameter is configured from
+   * \return Place in configuration file this parameter is configured from
    */
   std::string GetConfigEntry()
   {

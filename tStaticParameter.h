@@ -157,6 +157,22 @@ public:
   }
 
   /*!
+   * \return Place in configuration file this parameter is configured from
+   */
+  std::string GetConfigEntry()
+  {
+    return implementation->GetConfigEntry();
+  }
+
+  /*!
+   * \return Name of parameter
+   */
+  std::string GetName()
+  {
+    return implementation->GetName();
+  }
+
+  /*!
    * \return Has parameter changed since last call to "ResetChanged" (or creation).
    */
   inline bool HasChanged()
