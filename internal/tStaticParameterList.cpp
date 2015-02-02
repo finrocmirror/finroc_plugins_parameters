@@ -132,7 +132,7 @@ void tStaticParameterList::Deserialize(const rrlib::xml::tNode& node, bool finst
       tStaticParameterImplementationBase* found = NULL;
       for (size_t i = 0; i < this->Size(); i++)
       {
-        if (xml_name == this->Get(i).GetName())
+        if (xml_name == this->Get(i).GetName() || xml_name == "Par " + this->Get(i).GetName()) // Support legacy files where "Par " prefix was not removed
         {
           found = &(this->Get(i));
           if (xml_index != i && (!print_loading_messages))
