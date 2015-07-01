@@ -382,7 +382,7 @@ rrlib::serialization::tOutputStream& operator << (rrlib::serialization::tOutputS
   }
   catch (const std::exception& e)
   {
-    FINROC_LOG_PRINT(ERROR, e); // Should never occur
+    FINROC_LOG_PRINT_STATIC(ERROR, e); // Should never occur
   }
 #endif
   return stream;
@@ -406,7 +406,7 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
       }
       catch (const std::exception& e)
       {
-        FINROC_LOG_PRINT(ERROR, e);
+        FINROC_LOG_PRINT_STATIC(ERROR, e);
         config_file.wrapped = rrlib::xml::tDocument();
         try
         {
@@ -414,7 +414,7 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
         }
         catch (const std::exception& e1)
         {
-          FINROC_LOG_PRINT(ERROR, e1);
+          FINROC_LOG_PRINT_STATIC(ERROR, e1);
         }
       }
     }
@@ -433,7 +433,7 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
     }
     catch (const std::exception& e)
     {
-      FINROC_LOG_PRINT(ERROR, e);
+      FINROC_LOG_PRINT_STATIC(ERROR, e);
     }
   }
 #endif

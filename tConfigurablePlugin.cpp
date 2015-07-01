@@ -92,7 +92,7 @@ rrlib::xml::tNode* tConfigurablePlugin::GetConfigRootNode()
   {
     if (!core::FinrocFileExists(config_file_name))
     {
-      FINROC_LOG_PRINT(WARNING, "Configuration file '", config_file_name, "' does not exist. Plugins are initialized with defaults. No additional plugins are loaded.");
+      FINROC_LOG_PRINT_STATIC(WARNING, "Configuration file '", config_file_name, "' does not exist. Plugins are initialized with defaults. No additional plugins are loaded.");
     }
     else
     {
@@ -191,7 +191,7 @@ void tConfigurablePlugin::SetConfigFile(const std::string& file_name)
 {
   if (first_plugin_initialized)
   {
-    FINROC_LOG_PRINT(WARNING, "Some configurable plugins were already initialized. Setting a config file now has no effect on them.");
+    FINROC_LOG_PRINT_STATIC(WARNING, "Some configurable plugins were already initialized. Setting a config file now has no effect on them.");
   }
   config_file_name = file_name;
 }

@@ -377,7 +377,7 @@ rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStr
     }
     catch (std::exception& e)
     {
-      FINROC_LOG_PRINT(ERROR, e);
+      FINROC_LOG_PRINT_STATIC(ERROR, e);
     }
   }
   return stream;
