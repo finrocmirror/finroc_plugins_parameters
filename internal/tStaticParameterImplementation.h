@@ -133,13 +133,13 @@ public:
 
   T& Get()
   {
-    current_value_temp = tPortImplementation::ToValue(ValuePointer()->template GetData<data_ports::numeric::tNumber>(), unit);
+    current_value_temp = tPortImplementation::ToValue(ValuePointer()->template GetData<data_ports::numeric::tNumber>());
     return current_value_temp;
   }
 
   virtual void Set(T new_value)
   {
-    tPortImplementation::Assign(ValuePointer()->template GetData<data_ports::numeric::tNumber>(), new_value, unit);
+    tPortImplementation::Assign(ValuePointer()->template GetData<data_ports::numeric::tNumber>(), new_value);
     tStaticParameterImplementationBase::NotifyChange();
   }
 
@@ -148,16 +148,12 @@ public:
 //----------------------------------------------------------------------
 protected:
 
-  /*! Unit of parameter */
-  data_ports::tUnit unit;
-
   /*! Temporary storage for current value - so that we can return reference */
   T current_value_temp;
 
 
   tStaticParameterImplementation(const internal::tParameterCreationInfo<T>& creation_info, bool constructor_prototype) :
-    tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<data_ports::numeric::tNumber>(), constructor_prototype, false, creation_info.config_entry),
-    unit(creation_info.unit)
+    tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<data_ports::numeric::tNumber>(), constructor_prototype, false, creation_info.config_entry)
   {
     if (creation_info.DefaultValueSet())
     {
@@ -168,7 +164,7 @@ protected:
   virtual tStaticParameterImplementationBase* DeepCopy() override
   {
     return new tStaticParameterImplementation(
-             core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(GetName(), unit), false);
+             core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(GetName()), false);
   }
 };
 
@@ -219,7 +215,7 @@ private:
   virtual tStaticParameterImplementationBase* DeepCopy() override
   {
     return new tBoundedNumericStaticParameterImplementation(
-             core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(this->GetName(), this->unit, bounds), false);
+             core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(this->GetName(), bounds), false);
   }
 };
 

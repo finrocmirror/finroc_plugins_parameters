@@ -104,7 +104,6 @@ public:
    * A framework element pointer is interpreted as parent.
    * tFrameworkElement::tFlags arguments are interpreted as flags.
    * tBounds<T> are parameter's bounds.
-   * tUnit argument is parameter's's unit.
    * const T& is interpreted as port's default value.
    * tParameterCreationInfo<T> argument is copied.
    *

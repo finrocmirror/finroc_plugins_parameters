@@ -103,7 +103,6 @@ public:
    * The first string is interpreted as parameter name, the second possibly as config entry.
    * A framework element pointer is interpreted as parent.
    * tBounds<T> are parameter's bounds.
-   * tUnit argument is parameter's unit.
    * const T& is interpreted as parameter's default value.
    * tChangeCallback can be specified - e.g. for immediate callback on parameter value change
    *
