@@ -105,6 +105,20 @@ public:
    * \throw Throws std::runtime_error if entry cannot be found
    */
   rrlib::xml::tNode& GetEntry(const std::string& entry, bool create = false);
+
+
+  /*!
+   * Search entry in configuration file via an XML path
+   *
+   * \param path_to_entry XML path to locate the entry in this config file
+   * \return XMLNode representing entry
+   *
+   * \throw Throws std::runtime_error if entry cannot be found
+   */
+  const rrlib::xml::tNode& FindEntry(const std::string& path_to_entry) const
+  {
+    return wrapped.FindNode(path_to_entry);
+  }
 #endif
 
   /*!
