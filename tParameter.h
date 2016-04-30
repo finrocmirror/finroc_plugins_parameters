@@ -228,6 +228,16 @@ public:
   }
 
   /*!
+   * Deletes port wrapped by this class.
+   * After calling this method, this object no longer wraps any object.
+   * Unless a new object is assigned, only GetWrapped() may called.
+   */
+  void ManagedDelete()
+  {
+    implementation.ManagedDelete();
+  }
+
+  /*!
    * Reset changed flag.
    */
   inline void ResetChanged()
