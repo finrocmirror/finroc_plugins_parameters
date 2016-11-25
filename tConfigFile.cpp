@@ -321,7 +321,7 @@ void tConfigFile::SaveFile(const std::string& new_filename)
 #ifdef _LIB_RRLIB_XML_PRESENT_
   // first: update tree
   core::tFrameworkElement* ann = GetAnnotated<core::tFrameworkElement>();
-  assert(ann);
+  if (ann)
   {
     rrlib::thread::tLock lock(ann->GetStructureMutex()); // nothing should change while we're doing this
     for (auto it = ann->SubElementsBegin(true); it != ann->SubElementsEnd(); ++it)
