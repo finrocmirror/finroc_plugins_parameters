@@ -115,11 +115,15 @@ public:
    * numeric type: The first numeric argument is interpreted as default_value.
    */
   template<typename ... ARGS>
-  tParameter(const ARGS&... args) : implementation(core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>>(args...))
+  tParameter(const ARGS&... args) : implementation()
   {
-    core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>> creation_info(args...);
-    implementation.GetWrapped()->AddAnnotation(*(new internal::tParameterInfo()));
-    SetConfigEntry(creation_info.config_entry);
+    core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<T>> creation_info(args...);
+    if (!(creation_info.flags.Raw() & core::tFrameworkElementFlags(core::tFrameworkElementFlag::DELETED).Raw())) // do not create parameter, if deleted flag is set
+    {
+      implementation = tImplementation(creation_info);
+      implementation.GetWrapped()->AddAnnotation(*(new internal::tParameterInfo()));
+      SetConfigEntry(creation_info.config_entry);
+    }
   }
 
   /*!
