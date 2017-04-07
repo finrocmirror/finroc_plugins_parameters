@@ -175,7 +175,9 @@ class tParameterImplementation<T, true> : public data_ports::tInputPort<T>
 //----------------------------------------------------------------------
 public:
 
-  tParameterImplementation() {}
+  tParameterImplementation() :
+    cache(nullptr)
+  {}
 
   tParameterImplementation(data_ports::tPortCreationInfo<T> creation_info) :
     data_ports::tInputPort<T>(creation_info),
