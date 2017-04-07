@@ -171,8 +171,8 @@ private:
   core::tFrameworkElement& GetParameterElement();
 
 
-  // should not be overriden again (see below)
-  virtual void Init() override;
+  // only method below should be overriden
+  virtual void Init() override final;
 
 #ifdef _LIB_RRLIB_XML_PRESENT_
   /*!

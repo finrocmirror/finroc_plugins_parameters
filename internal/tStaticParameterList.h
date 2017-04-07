@@ -90,8 +90,6 @@ public:
    */
   void Add(tStaticParameterImplementationBase& param);
 
-  virtual void AnnotatedObjectInitialized() override;
-
 #ifdef _LIB_RRLIB_XML_PRESENT_
   /*!
    * XML Deserialization implementation
@@ -135,7 +133,10 @@ public:
   /*!
    * \return Description for log messages
    */
-  std::string GetLogDescription() const;
+  const tStaticParameterList& GetLogDescription() const
+  {
+    return *this;
+  }
 
   /*!
    * Get or create StaticParameterList for Framework element
@@ -144,6 +145,8 @@ public:
    * \return StaticParameterList
    */
   static tStaticParameterList& GetOrCreate(core::tFrameworkElement& fe);
+
+  virtual void OnInitialization() override;
 
 #ifdef _LIB_RRLIB_XML_PRESENT_
   /*!
@@ -188,6 +191,7 @@ private:
   void Clear();
 };
 
+std::ostream& operator << (std::ostream& output, const tStaticParameterList& list);
 rrlib::serialization::tOutputStream& operator << (rrlib::serialization::tOutputStream& stream, const tStaticParameterList& list);
 rrlib::serialization::tInputStream& operator >> (rrlib::serialization::tInputStream& stream, tStaticParameterList& list);
 #ifdef _LIB_RRLIB_XML_PRESENT_

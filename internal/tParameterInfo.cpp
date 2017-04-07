@@ -84,18 +84,6 @@ tParameterInfo::tParameterInfo() :
   finstruct_default()
 {}
 
-void tParameterInfo::AnnotatedObjectInitialized()
-{
-  try
-  {
-    LoadValue(true);
-  }
-  catch (const std::exception& e)
-  {
-    FINROC_LOG_PRINT(ERROR, e);
-  }
-}
-
 #ifdef _LIB_RRLIB_XML_PRESENT_
 void tParameterInfo::Deserialize(const rrlib::xml::tNode& node, bool finstruct_context, bool include_commmand_line)
 {
@@ -177,13 +165,13 @@ void tParameterInfo::LoadValue(bool ignore_ready)
               std::string error = port.BrowserPublish(buffer);
               if (error.size() > 0)
               {
-                FINROC_LOG_PRINT(WARNING, "Failed to load parameter '", ann->GetQualifiedName(), "' from command line argument '", arg, "': ", error);
+                FINROC_LOG_PRINT(WARNING, "Failed to load parameter '", ann, "' from command line argument '", arg, "': ", error);
               }
               return;
             }
             catch (const std::exception& e)
             {
-              FINROC_LOG_PRINT(ERROR, "Failed to load parameter '", ann->GetQualifiedName(), "' from command line argument '", arg, "': ", e);
+              FINROC_LOG_PRINT(ERROR, "Failed to load parameter '", ann, "' from command line argument '", arg, "': ", e);
             }
           }
           else
@@ -213,13 +201,13 @@ void tParameterInfo::LoadValue(bool ignore_ready)
               std::string error = port.BrowserPublish(buffer);
               if (error.size() > 0)
               {
-                FINROC_LOG_PRINT(WARNING, "Failed to load parameter '", ann->GetQualifiedName(), "' from config entry '", full_config_entry, "': ", error);
+                FINROC_LOG_PRINT(WARNING, "Failed to load parameter '", ann, "' from config entry '", full_config_entry, "': ", error);
               }
               return;
             }
             catch (const std::exception& e)
             {
-              FINROC_LOG_PRINT(ERROR, "Failed to load parameter '", ann->GetQualifiedName(), "' from config entry '", full_config_entry, "': ", e);
+              FINROC_LOG_PRINT(ERROR, "Failed to load parameter '", ann, "' from config entry '", full_config_entry, "': ", e);
             }
           }
           else
@@ -245,13 +233,13 @@ void tParameterInfo::LoadValue(bool ignore_ready)
             std::string error = port.BrowserPublish(buffer);
             if (error.size() > 0)
             {
-              FINROC_LOG_PRINT(WARNING, "Failed to load parameter '", ann->GetQualifiedName(), "' from finstruct default '", finstruct_default, "': ", error);
+              FINROC_LOG_PRINT(WARNING, "Failed to load parameter '", ann, "' from finstruct default '", finstruct_default, "': ", error);
             }
             return;
           }
           catch (const std::exception& e)
           {
-            FINROC_LOG_PRINT(ERROR, "Failed to load parameter '", ann->GetQualifiedName(), "' from finstruct default '", finstruct_default, "': ", e);
+            FINROC_LOG_PRINT(ERROR, "Failed to load parameter '", ann, "' from finstruct default '", finstruct_default, "': ", e);
           }
         }
         else
@@ -260,6 +248,18 @@ void tParameterInfo::LoadValue(bool ignore_ready)
         }
       }
     }
+  }
+}
+
+void tParameterInfo::OnInitialization()
+{
+  try
+  {
+    LoadValue(true);
+  }
+  catch (const std::exception& e)
+  {
+    FINROC_LOG_PRINT(ERROR, e);
   }
 }
 
@@ -282,7 +282,7 @@ void tParameterInfo::SaveValue()
       bool is_default = false;
       if (default_value)
       {
-        std::unique_ptr<rrlib::rtti::tGenericObject> current_value(default_value->GetType().CreateInstanceGeneric());
+        std::unique_ptr<rrlib::rtti::tGenericObject> current_value(default_value->GetType().CreateGenericObject());
         port.Get(*current_value);
         if (current_value->Equals(*default_value))
         {
@@ -294,7 +294,7 @@ void tParameterInfo::SaveValue()
       {
 #ifdef _LIB_RRLIB_XML_PRESENT_
         rrlib::xml::tNode& node = cf->GetEntry(config_entry, true);
-        std::unique_ptr<rrlib::rtti::tGenericObject> current_value(port.GetDataType().CreateInstanceGeneric());
+        std::unique_ptr<rrlib::rtti::tGenericObject> current_value(port.GetDataType().CreateGenericObject());
         port.Get(*current_value);
         current_value->Serialize(node);
 #endif

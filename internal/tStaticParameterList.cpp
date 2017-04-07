@@ -91,11 +91,6 @@ void tStaticParameterList::Add(tStaticParameterImplementationBase& param)
   parameters.push_back(&param);
 }
 
-void tStaticParameterList::AnnotatedObjectInitialized()
-{
-  DoStaticParameterEvaluation(*GetAnnotated());
-}
-
 void tStaticParameterList::Clear()
 {
   for (int i = parameters.size() - 1; i >= 0; i--)
@@ -249,16 +244,6 @@ void tStaticParameterList::DoStaticParameterEvaluation(core::tFrameworkElement& 
   }
 }
 
-std::string tStaticParameterList::GetLogDescription() const
-{
-  core::tFrameworkElement* annotated = this->GetAnnotated();
-  if (annotated)
-  {
-    return "Static Parameter List of " + annotated->GetQualifiedName();
-  }
-  return "Static Parameter List (not attached)";
-}
-
 tStaticParameterList& tStaticParameterList::GetOrCreate(core::tFrameworkElement& fe)
 {
   tStaticParameterList* result = fe.GetAnnotation<tStaticParameterList>();
@@ -268,6 +253,25 @@ tStaticParameterList& tStaticParameterList::GetOrCreate(core::tFrameworkElement&
     fe.AddAnnotation(*result);
   }
   return *result;
+}
+
+void tStaticParameterList::OnInitialization()
+{
+  DoStaticParameterEvaluation(*GetAnnotated());
+}
+
+std::ostream& operator << (std::ostream& output, const tStaticParameterList& list)
+{
+  core::tFrameworkElement* annotated = list.GetAnnotated();
+  if (annotated)
+  {
+    output << "Static Parameter List of " << (*annotated);
+  }
+  else
+  {
+    output << "Static Parameter List (not attached)";
+  }
+  return output;
 }
 
 #ifdef _LIB_RRLIB_XML_PRESENT_

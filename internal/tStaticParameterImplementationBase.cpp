@@ -115,7 +115,7 @@ void tStaticParameterImplementationBase::AttachTo(tStaticParameterImplementation
   }
 
   tStaticParameterImplementationBase& sp = GetParameterWithBuffer();
-  if (sp.type == NULL)
+  if (!sp.type)
   {
     sp.type = type;
   }
@@ -134,7 +134,7 @@ void tStaticParameterImplementationBase::AttachTo(tStaticParameterImplementation
 void tStaticParameterImplementationBase::CreateBuffer(rrlib::rtti::tType type)
 {
   tStaticParameterImplementationBase& sp = GetParameterWithBuffer();
-  sp.value.reset(type.CreateInstanceGeneric());
+  sp.value.reset(type.CreateGenericObject());
   assert(sp.value);
   assert(type.GetRttiName() != typeid(tStaticParameterList).name());
 }
@@ -143,8 +143,7 @@ void tStaticParameterImplementationBase::Deserialize(rrlib::serialization::tInpu
 {
   // Skip name and parameter type
   is.ReadString();
-  rrlib::rtti::tType dt;
-  is >> dt;
+  is.ReadShort();
 
   std::string command_line_option_tmp = is.ReadString();
   std::string outer_parameter_attachment_temp = is.ReadString();
@@ -219,8 +218,7 @@ void tStaticParameterImplementationBase::DeserializeValue(rrlib::serialization::
 {
   if (is.ReadBoolean())
   {
-    rrlib::rtti::tType dt;
-    is >> dt;
+    rrlib::rtti::tType dt = rrlib::rtti::tType::GetType(is.ReadShort());
     rrlib::rtti::tGenericObject* val = ValuePointer();
     if (val->GetType() != dt)
     {
@@ -344,7 +342,7 @@ void tStaticParameterImplementationBase::ResetChanged()
   assert(sp.value);
   if ((!last_value) || last_value->GetType() != sp.value->GetType())
   {
-    last_value.reset(sp.value->GetType().CreateInstanceGeneric());
+    last_value.reset(sp.value->GetType().CreateGenericObject());
   }
   assert(last_value);
 
@@ -366,8 +364,8 @@ void tStaticParameterImplementationBase::Serialize(rrlib::serialization::tOutput
   os.WriteBoolean(enforce_current_value);
 
   rrlib::rtti::tGenericObject* val = ValuePointer();
-  os.WriteBoolean(val != NULL);
-  if (val != NULL)
+  os.WriteBoolean(val);
+  if (val)
   {
     os << val->GetType();
     val->Serialize(os, rrlib::serialization::tDataEncoding::XML);
@@ -406,7 +404,7 @@ void tStaticParameterImplementationBase::Serialize(rrlib::xml::tNode& node, bool
 
 void tStaticParameterImplementationBase::Set(const std::string& s)
 {
-  assert(type != NULL);
+  assert(type);
   //rrlib::rtti::tType dt = sSerializationHelper::GetTypedStringDataType(type, s);
   rrlib::rtti::tGenericObject* val = ValuePointer();
   if (val->GetType() != type)
@@ -499,7 +497,7 @@ void tStaticParameterImplementationBase::UpdateOuterParameterAttachment(bool out
         sp = new tStaticParameterImplementationBase(outer_parameter_attachment, type, false, true);
         AttachTo(sp);
         spl.Add(*sp);
-        FINROC_LOG_PRINT(DEBUG, "Creating proxy parameter '", outer_parameter_attachment, "' in '", fg->GetQualifiedName() + "'.");
+        FINROC_LOG_PRINT(DEBUG, "Creating proxy parameter '", outer_parameter_attachment, "' in '", fg, "'.");
       }
       else
       {
