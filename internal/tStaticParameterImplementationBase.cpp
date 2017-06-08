@@ -143,7 +143,8 @@ void tStaticParameterImplementationBase::Deserialize(rrlib::serialization::tInpu
 {
   // Skip name and parameter type
   is.ReadString();
-  is.ReadShort();
+  rrlib::rtti::tType dt;
+  is >> dt;
 
   std::string command_line_option_tmp = is.ReadString();
   std::string outer_parameter_attachment_temp = is.ReadString();
@@ -214,18 +215,18 @@ void tStaticParameterImplementationBase::Deserialize(const rrlib::xml::tNode& no
 }
 #endif
 
-void tStaticParameterImplementationBase::DeserializeValue(rrlib::serialization::tInputStream& is)
+void tStaticParameterImplementationBase::DeserializeValue(rrlib::serialization::tInputStream& stream)
 {
-  if (is.ReadBoolean())
+  if (stream.ReadBoolean())
   {
-    rrlib::rtti::tType dt = rrlib::rtti::tType::GetType(is.ReadShort());
-    rrlib::rtti::tGenericObject* val = ValuePointer();
-    if (val->GetType() != dt)
+    rrlib::rtti::tType type;
+    stream >> type;
+    rrlib::rtti::tGenericObject* value = ValuePointer();
+    if (value->GetType() != type)
     {
-      CreateBuffer(dt);
-      val = ValuePointer();
+      throw std::runtime_error("Objects of different type than parameter type are not supported");
     }
-    val->Deserialize(is, rrlib::serialization::tDataEncoding::XML);
+    value->Deserialize(stream, rrlib::serialization::tDataEncoding::XML);
     NotifyChange();
   }
 }

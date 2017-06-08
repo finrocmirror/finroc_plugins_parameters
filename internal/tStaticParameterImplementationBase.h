@@ -111,9 +111,9 @@ public:
   /*!
    * Deserializes value from stream
    *
-   * \param is Input stream
+   * \param stream Input stream
    */
-  void DeserializeValue(rrlib::serialization::tInputStream& is);
+  void DeserializeValue(rrlib::serialization::tInputStream& stream);
 
   /*!
    * \param result Result buffer for all attached parameters (including those from parameters this parameter is possibly (indirectly) attached to)
