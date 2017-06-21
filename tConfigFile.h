@@ -86,6 +86,15 @@ public:
    */
   tConfigFile();
 
+
+  /*!
+   * Appends all entries from specified config file to this one
+   *
+   * \param filename File name of configuration file (loaded if it exists)
+   * \throw Throws std::exception if specified file cannot be found or loaded
+   */
+  void Append(const std::string& filename);
+
   /*!
    * Find ConfigFile which specified element is configured from
    *

@@ -124,6 +124,26 @@ tConfigFile::tConfigFile(const std::string& filename, bool optional) :
 #endif
 }
 
+void tConfigFile::Append(const std::string& filename)
+{
+#ifdef _LIB_RRLIB_XML_PRESENT_
+  if (core::FinrocFileExists(filename))
+  {
+    // merge entries into first document
+    auto document = core::GetFinrocXMLDocument(filename, false); // false = do not validate with dtd
+    auto& root_node = document.RootNode();
+    for (auto it = root_node.ChildrenBegin(); it != root_node.ChildrenEnd(); ++it)
+    {
+      this->wrapped.RootNode().AddChildNode(*it, true); // not using copy resulted in erroneous behavior
+    }
+  }
+  else
+  {
+    throw std::runtime_error("Specified config file not found: " + filename);
+  }
+#endif
+}
+
 #ifdef _LIB_RRLIB_XML_PRESENT_
 rrlib::xml::tNode& tConfigFile::CreateEntry(const std::string& entry, bool leaf)
 {
