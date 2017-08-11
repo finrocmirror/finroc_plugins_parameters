@@ -75,7 +75,7 @@ namespace parameters
 template <typename T>
 class tParameter
 {
-  typedef internal::tParameterImplementation < T, data_ports::IsNumeric<T>::value || std::is_same<bool, T>::value > tImplementation;
+  typedef internal::tParameterImplementation < T, std::is_arithmetic<T>::value || std::is_same<bool, T>::value > tImplementation;
 
   typedef data_ports::api::tPortImplementation<T, data_ports::api::tPortImplementationTypeTrait<T>::type> tPortImplementation;
 

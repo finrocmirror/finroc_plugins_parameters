@@ -84,7 +84,7 @@ class tStaticParameter
 protected:
 
   /*! Class that contains actual implementation of most functionality */
-  typedef internal::tStaticParameterImplementation < T, data_ports::IsNumeric<T>::value && (!definitions::cSINGLE_THREADED) > tImplementation;
+  typedef internal::tStaticParameterImplementation < T, std::is_arithmetic<T>::value && (!std::is_same<bool, T>::value) && (!definitions::cSINGLE_THREADED) > tImplementation;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs

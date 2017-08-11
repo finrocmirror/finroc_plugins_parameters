@@ -121,9 +121,6 @@ template <typename T>
 class tStaticParameterImplementation<T, true> : public tStaticParameterImplementationBase
 {
 
-  /*! Class that contains port implementation for type T */
-  typedef data_ports::api::tPortImplementation<T, data_ports::api::tPortImplementationTypeTrait<T>::type> tPortImplementation;
-
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
@@ -133,13 +130,12 @@ public:
 
   T& Get()
   {
-    current_value_temp = tPortImplementation::ToValue(ValuePointer()->template GetData<data_ports::numeric::tNumber>());
-    return current_value_temp;
+    return ValuePointer()->template GetData<T>();
   }
 
   virtual void Set(T new_value)
   {
-    tPortImplementation::Assign(ValuePointer()->template GetData<data_ports::numeric::tNumber>(), new_value);
+    ValuePointer()->template GetData<T>() = new_value;
     tStaticParameterImplementationBase::NotifyChange();
   }
 
@@ -148,12 +144,8 @@ public:
 //----------------------------------------------------------------------
 protected:
 
-  /*! Temporary storage for current value - so that we can return reference */
-  T current_value_temp;
-
-
   tStaticParameterImplementation(const internal::tParameterCreationInfo<T>& creation_info, bool constructor_prototype) :
-    tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<data_ports::numeric::tNumber>(), constructor_prototype, false, creation_info.config_entry)
+    tStaticParameterImplementationBase(creation_info.name, rrlib::rtti::tDataType<T>(), constructor_prototype, false, creation_info.config_entry)
   {
     if (creation_info.DefaultValueSet())
     {
@@ -163,8 +155,9 @@ protected:
 
   virtual tStaticParameterImplementationBase* DeepCopy() override
   {
-    return new tStaticParameterImplementation(
-             core::tPortWrapperBase::tConstructorArguments<internal::tParameterCreationInfo<T>>(GetName()), false);
+    internal::tParameterCreationInfo<T> creation_info;
+    creation_info.name = GetName();
+    return new tStaticParameterImplementation(creation_info, false);
   }
 };
 
