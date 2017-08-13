@@ -120,24 +120,7 @@ void tParameterInfo::Deserialize(const rrlib::xml::tNode& node, bool finstruct_c
 
 bool tParameterInfo::IsFinstructableGroupResponsibleForConfigFileConnections(const core::tFrameworkElement& finstructable_group, const core::tFrameworkElement& ap)
 {
-  tConfigFile* cf = tConfigFile::Find(ap);
-  if (cf == NULL)
-  {
-    return finstructable_group.GetParentWithFlags(core::tFrameworkElement::tFlag::FINSTRUCTABLE_GROUP) == NULL;
-  }
-  core::tFrameworkElement* config_element = cf->GetAnnotated<core::tFrameworkElement>();
-  const core::tFrameworkElement* responsible = config_element->GetFlag(core::tFrameworkElement::tFlag::FINSTRUCTABLE_GROUP) ?
-      config_element : config_element->GetParentWithFlags(core::tFrameworkElement::tFlag::FINSTRUCTABLE_GROUP);
-  if (!responsible)
-  {
-    // ok, config file is probably attached to runtime. Choose outer-most finstructable group.
-    responsible = &finstructable_group;
-    const core::tFrameworkElement* tmp;
-    while ((tmp = responsible->GetParentWithFlags(core::tFrameworkElement::tFlag::FINSTRUCTABLE_GROUP)) != NULL)
-    {
-      responsible = tmp;
-    }
-  }
+  core::tFrameworkElement* responsible = ap.GetParentWithFlags(core::tFrameworkElement::tFlag::FINSTRUCTABLE_GROUP | core::tFrameworkElement::tFlag::MANAGES_PARAMETER_CONFIGURATION);
   return responsible == &finstructable_group;
 }
 
